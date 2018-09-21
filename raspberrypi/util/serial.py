@@ -1,57 +1,33 @@
 #!/usr/bin/env python3
 
-import time, serial, json, threading
-from datetime import datetime, timedelta
+import time, serial, json
 
-interval = 30 # seconds
-last = 0
+class Serial:
 
-def read_serial():
-	ser.write(bytearray('t','ascii')) # trigger arduino to deliver data
+    def __init__(self, config):
+        self.config = config
+        self.interfaces = self.config.get_serial_interfaces()
+        self.prev_values = [0] * len( self.interfaces )
 
-	while (ser.inWaiting() == 0):
-		time.sleep(0.01)
-	data = ser.readline().decode("utf-8")
+        self.conn = serial.Serial( '/dev/serial0', baudrate=115200 )
 
-	return json.loads(data)
+    def read_serial(self):
+        self.conn.write(bytearray('t','ascii')) # trigger arduino to report total data
+        while (self.conn.inWaiting() == 0):
+            time.sleep(0.001)
+        data = self.conn.readline().decode("utf-8")
+        return json.loads(data)
 
-def log(meter_readings):
-	global last
+    def get_power_since_last_request(self):
+        new_values = self.read_serial()[0:len( self.interfaces )]
+        diff = [i - j for i, j in zip(new_values, self.prev_values)]
+        self.prev_values = new_values
+        return diff
 
-	current_power = ''
-	if (last is not 0):
-		current_power = str('%.2f' % ((meter_readings[0]-last) / 1000 * (3600 / interval) )) + ' kWh'
 
-	log_str = str(datetime.now())+'\t'+json.dumps(meter_readings)+'\t'+current_power
-	print(log_str)
-	with open('s0_log.txt', 'a') as out:
-		out.write(log_str+'\n')
-
-	last = sum(meter_readings)
+    def close(self):
+        self.conn.close()
 
 if __name__ == '__main__':
 
-	ser = serial.Serial(
-		'/dev/serial0',
-		baudrate=115200
-	)
-
-	time.sleep(1)
-
-	try:
-
-		# retrieve data from ATmega328P every 30 seconds
-		while True:
-			meter_readings = read_serial()
-			log(meter_readings)
-			
-			time.sleep(interval)
-			
-	except KeyboardInterrupt:
-		print("Exiting program")
-	except Exception as e:
-		print("Error occured", e)
-	finally:
-		ser.close()
-		pass
-
+    print('nothing to do here')
