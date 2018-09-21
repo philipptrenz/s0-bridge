@@ -32,4 +32,7 @@ python3 raspberrypi/bridge.py
 
 ## Disclaimer 
 
-Dealing with mains voltage is life-threatening! The project uses only low voltage, but usually the power distribution box needs to be opened for connecting cables to the S0 interface. I expressly point out that this, as well as the installation of an electricity meter, may only be performed by qualified personne
+**Dealing with mains voltage is life-threatening!** 
+
+The project uses only low voltage, but usually the power distribution box needs to be opened for connecting cables to the S0 interface. I expressly point out that this, as well as the installation of an electricity meter, may only be performed by qualified personnel.
+
