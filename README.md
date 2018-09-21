@@ -7,6 +7,29 @@ This project uses a Raspberry Pi running SBFspot which carries an Arduino Pro Mi
 **NOTE**: This circuit provides a voltage of 5VDC to the S0 interface of a connected power meter. This may not be sufficient for every S0 interface. The circuit diagram can certainly be adjusted accordingly the specs of any S0-enabled power meter, but I will not provide any support therefore. However, it works well with the _Eltako DSZ15D_ for example.
 
 
+## How to use
+
+### Install dependencies
+
+```bash
+sudo apt install python3 python3-pip
+sudo pip3 install sqlite3 serial
+```
+
+### Enable Pis serial interface
+ 
+ 1. Enter `sudo raspi-config`
+ 1. Choose _1 Interfacing Options_
+ 1. Choose _P6 Serial_
+ 1. Disable shell via serial interface
+ 1. Enable serial port hardware
+
+### Start the bridge
+
+```python
+python3 raspberrypi/bridge.py
+```
+
 ## Disclaimer 
 
-Dealing with mains voltage is life-threatening! The project uses only low voltage, but usually the power distribution box needs to be opened for connecting cables to the S0 interface. I expressly point out that this, as well as the installation of an electricity meter, may only be performed by qualified personnel.
+Dealing with mains voltage is life-threatening! The project uses only low voltage, but usually the power distribution box needs to be opened for connecting cables to the S0 interface. I expressly point out that this, as well as the installation of an electricity meter, may only be performed by qualified personne
