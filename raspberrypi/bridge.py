@@ -24,7 +24,7 @@ if __name__ == '__main__':
             ts_log = roundup(ts)
 
             newData = ser.get_power_since_last_request()
-            print(ts_log, '\t', )
+            print(ts_log, '\t', newData, '\t', datetime.now())
 
         t.sleep(1)
 

@@ -8,6 +8,7 @@ class Serial:
         self.config = config
         self.interfaces = self.config.get_serial_interfaces()
         self.prev_values = [0] * len( self.interfaces )
+        self.initialized = False
 
         self.conn = serial.Serial( '/dev/serial0', baudrate=115200 )
 
@@ -22,7 +23,10 @@ class Serial:
         new_values = self.read_serial()[0:len( self.interfaces )]
         diff = [i - j for i, j in zip(new_values, self.prev_values)]
         self.prev_values = new_values
-        return diff
+        self.initialized = True
+
+        if not self.initialized: return [0] * len( self.interfaces )
+        else: return diff
 
 
     def close(self):
