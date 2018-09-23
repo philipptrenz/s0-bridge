@@ -8,7 +8,7 @@
 			"baudrate": 115200,
 			"interfaces": [
 				{
-					"serial_id": "0000000001",c
+					"serial_id": "0000000001",
 					"name": "My Power Plant",
 					"type": "SBFspot-S0-bridge v0",
 					"prev_etotal": 0
