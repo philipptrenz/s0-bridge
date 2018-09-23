@@ -6,12 +6,14 @@
 		"serial": {
 			"path": "/dev/serial0",
 			"baudrate": 115200,
+            "timeout": 1,
 			"interfaces": [
 				{
 					"serial_id": "0000000001",
 					"name": "My Power Plant",
-					"type": "SBFspot-S0-bridge v0",
-					"prev_etotal": 0
+					"type": "inverter",
+					"prev_etotal": 0,
+					"pulses_per_kwh": 1000
 				}
 			]
 		},

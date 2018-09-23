@@ -5,14 +5,21 @@ import json, os.path
 
 class Config():
 
-    def __init__(self):
+    def __init__(self, config_path=None):
         self.config = dict()
-        try:
-            with open('config.json') as f:
+        if config_path is not None:
+            with open(config_path) as f:
                 self.config = json.load(f)
-        except:
-            with open('config.default.json') as f:
-                self.config = json.load(f)
+        else:
+            try:
+                with open('config.json') as f:
+                    self.config = json.load(f)
+            except:
+                with open('config.default.json') as f:
+                    self.config = json.load(f)
+
+    def print(self):
+        print(self.config)
 
     def get_config(self):
         return self.config
@@ -26,3 +33,11 @@ class Config():
 
     def get_serial_config(self):
         return self.config["data_interfaces"]["serial"]
+
+    def get_connection_interfaces(self):
+        interfaces = list()
+        if "interfaces" in self.config["data_interfaces"]["serial"]:
+            interfaces.extend(self.config["data_interfaces"]["serial"]["interfaces"])
+        if "interfaces" in self.config["data_interfaces"]["network"]:
+            interfaces.extend(self.config["data_interfaces"]["network"]["interfaces"])
+        return interfaces

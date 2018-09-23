@@ -9,12 +9,17 @@ from util.serial  import Serial
 def roundup(x):
     return int(math.ceil(x / 100.0)) * 100
 
-def collect_data(ts):
+def collect_data(db, ts):
+    print('Collecting data ...')
     ts_log = roundup(ts)
 
     # serial data
     new_serial_data = ser.get_power_since_last_request()
+    db.add_day_data_rows(ts_log, new_serial_data)
+    db.add_month_data_rows(new_serial_data)
+
     print(ts_log, '\t', new_serial_data, '\t', datetime.now())
+
 
 
 if __name__ == '__main__':
@@ -23,16 +28,22 @@ if __name__ == '__main__':
     db = Database(config)
     ser = Serial(config)
 
-    print('SBFspot S0 bridge started')
+    print('S0 SBFspot bridge started \n')
+
+    print('Adding inverters')
+    db.add_inverters()
+
     print('Waiting to retrieve data ...')
     try:
+
+        # TODO: REMOVE, JUST FOR TESTING
+        collect_data(db, datetime.now().timestamp())
+
         while True:
             ts =  datetime.now().timestamp()
-
             # before minute of time is a multiple of 5 minutes
             if (int(ts) % 300) == 299:
-                collect_data(ts)
-
+                collect_data(db, ts)
             t.sleep(1)
 
     except KeyboardInterrupt:
