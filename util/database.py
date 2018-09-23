@@ -11,7 +11,8 @@ class Database():
         self.db = sqlite3.connect(self.config.get_database_path(), check_same_thread=False)
         self.c = self.db.cursor()
 
-
+    def close(self):
+        self.db.close()
 
 if __name__ == '__main__':
     print('nothing to do here')
