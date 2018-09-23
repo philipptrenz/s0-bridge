@@ -19,11 +19,12 @@ if __name__ == '__main__':
     while True:
         ts =  datetime.now().timestamp()
 
-        # before 5 minutes have elapsed
+        # before minute of time is a multiple of 5 minutes
         if (int(ts) % 300) == 299:
             ts_log = roundup(ts)
 
             newData = ser.get_power_since_last_request()
+
             print(ts_log, '\t', newData, '\t', datetime.now())
 
         t.sleep(1)

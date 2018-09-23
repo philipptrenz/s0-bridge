@@ -24,5 +24,5 @@ class Config():
         else:
             raise Exception("sqlite database %s does not exist, check the config(.default).json!" % path)
 
-    def get_serial_interfaces(self):
-        return self.config["interfaces"]["serial"]
+    def get_serial_config(self):
+        return self.config["data_interfaces"]["serial"]

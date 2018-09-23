@@ -1,0 +1,22 @@
+{
+	"database": {
+		"path": "/home/pi/smadata/SBFspot.db"
+	},
+	"data_interfaces": {
+		"serial": {
+			"path": "/dev/serial0",
+			"baudrate": 115200,
+			"interfaces": [
+				{
+					"serial_id": "0000000001",c
+					"name": "My Power Plant",
+					"type": "SBFspot-S0-bridge v0",
+					"prev_etotal": 0
+				}
+			]
+		},
+		"network": {
+			"interfaces": []
+		}
+	}
+}
