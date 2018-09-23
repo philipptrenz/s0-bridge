@@ -9,6 +9,13 @@ from util.serial  import Serial
 def roundup(x):
     return int(math.ceil(x / 100.0)) * 100
 
+def collect_data(ts):
+    ts_log = roundup(ts)
+
+    # serial data
+    new_serial_data = ser.get_power_since_last_request()
+    print(ts_log, '\t', new_serial_data, '\t', datetime.now())
+
 
 if __name__ == '__main__':
 
@@ -24,11 +31,13 @@ if __name__ == '__main__':
 
         # before minute of time is a multiple of 5 minutes
         if (int(ts) % 300) == 299:
-            ts_log = roundup(ts)
 
-            new_serial_data = ser.get_power_since_last_request()
-
-            print(ts_log, '\t', new_serial_data, '\t', datetime.now())
+            try:
+                collect_data(ts)
+            except KeyboardInterrupt:
+                print('Shutting down')
+            except Exception as e:
+                print('Error occured', e)
 
         t.sleep(1)
 

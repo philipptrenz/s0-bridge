@@ -23,6 +23,7 @@ sudo pip3 install sqlite3 pyserial
  1. Choose _P6 Serial_
  1. Disable shell via serial interface
  1. Enable serial port hardware
+ 1. Reboot the Pi
 
 ### Start the bridge
 
