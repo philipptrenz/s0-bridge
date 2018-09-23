@@ -25,19 +25,20 @@ if __name__ == '__main__':
 
     print('SBFspot S0 bridge started')
     print('Waiting to retrieve data ...')
+    try:
+        while True:
+            ts =  datetime.now().timestamp()
 
-    while True:
-        ts =  datetime.now().timestamp()
-
-        # before minute of time is a multiple of 5 minutes
-        if (int(ts) % 300) == 299:
-
-            try:
+            # before minute of time is a multiple of 5 minutes
+            if (int(ts) % 300) == 299:
                 collect_data(ts)
-            except KeyboardInterrupt:
-                print('Shutting down')
-            except Exception as e:
-                print('Error occured', e)
 
-        t.sleep(1)
+            t.sleep(1)
 
+    except KeyboardInterrupt:
+        print('Shutting down')
+    except Exception as e:
+        print('Error occured', e)
+    finally:
+        db.close()
+        ser.close()
