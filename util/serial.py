@@ -24,8 +24,8 @@ class Serial:
         if self.initialized:
             new_values = self.read_serial()[0:len( self.interfaces )]
             diff = [i - j for i, j in zip(new_values, self.prev_values)]
+            self.prev_values = new_values
         else: self.initialized = True
-        self.prev_values = new_values
         return diff
 
 

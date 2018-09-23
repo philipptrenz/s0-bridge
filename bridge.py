@@ -16,6 +16,9 @@ if __name__ == '__main__':
     db = Database(config)
     ser = Serial(config)
 
+    print('SBFspot S0 bridge started')
+    print('Waiting to retrieve data ...')
+
     while True:
         ts =  datetime.now().timestamp()
 
@@ -23,9 +26,9 @@ if __name__ == '__main__':
         if (int(ts) % 300) == 299:
             ts_log = roundup(ts)
 
-            newData = ser.get_power_since_last_request()
+            new_serial_data = ser.get_power_since_last_request()
 
-            print(ts_log, '\t', newData, '\t', datetime.now())
+            print(ts_log, '\t', new_serial_data, '\t', datetime.now())
 
         t.sleep(1)
 
