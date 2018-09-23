@@ -27,7 +27,7 @@ sudo pip3 install sqlite3 pyserial
 ### Start the bridge
 
 ```python
-python3 raspberrypi/bridge.py
+python3 bridge.py
 ```
 
 ## Disclaimer 
