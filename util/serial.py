@@ -21,11 +21,12 @@ class Serial:
 
     def get_power_since_last_request(self):
         diff = [0] * len(self.interfaces)
+        new_values = self.read_serial()[0:len(self.interfaces)]
         if self.initialized:
-            new_values = self.read_serial()[0:len( self.interfaces )]
             diff = [i - j for i, j in zip(new_values, self.prev_values)]
-            self.prev_values = new_values
-        else: self.initialized = True
+        else:
+            self.initialized = True
+        self.prev_values = new_values
         return diff
 
 
