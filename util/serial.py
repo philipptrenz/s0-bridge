@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import time, serial, json, re
+import time, serial, json, random
 
 class Serial:
 
@@ -40,14 +40,16 @@ class Serial:
         for idx, inv in enumerate(self.interfaces):
 
             power = 0
+            watts = 0
             if self.last_retrieved != 0:
                 pulses = diff[idx]
-                watts = pulses / inv["pulses_per_kwh"] * 1000
-                power =  (watts / (now - self.last_retrieved) * 3600)  # convert to Wh (relative to 1 hour)
+                watts = int(pulses / inv["pulses_per_kwh"] * 1000)
+                power = int(watts / (now - self.last_retrieved) * 3600)  # convert to Wh (relative to 1 hour)
 
             res.append({
-                "inverter": inv,
-                "power": power
+                "watts": watts,
+                "power": power,
+                "inverter": inv
             })
 
         self.last_retrieved = now
