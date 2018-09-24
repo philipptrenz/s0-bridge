@@ -17,7 +17,7 @@ def collect_data(db, ts):
     db.add_day_data_rows(ts_log, new_serial_data)
     #db.add_month_data_rows(new_serial_data)
 
-    print(ts_log, '\t', new_serial_data, '\t', datetime.now())
+    print(ts_log, '\t', 'watts:', new_serial_data['watts'], ', power:', new_serial_data['power'], '\t', datetime.now())
 
 
 
@@ -33,7 +33,6 @@ if __name__ == '__main__':
     ser.get_power_since_last_request()
     db.add_inverters()
 
-    print('Waiting to retrieve data ...')
     try:
 
         while True:
