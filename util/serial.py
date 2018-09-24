@@ -32,7 +32,7 @@ class Serial:
         diff = [0] * len(self.interfaces)
         new_values = self.read_serial()[0:len(self.interfaces)]
         now = time.time()
-        if self.last_retrieved == 0:
+        if not self.last_retrieved == 0:
             diff = [i - j for i, j in zip(new_values, self.prev_values)] # Pulses since last retrieval
         self.prev_values = new_values
 
@@ -43,8 +43,8 @@ class Serial:
             watts = 0
             if self.last_retrieved != 0:
                 pulses = diff[idx]
-                watts = int(pulses / inv["pulses_per_kwh"] * 1000)
-                power = int(watts / (now - self.last_retrieved) * 3600)  # convert to Wh (relative to 1 hour)
+                watts = int(pulses / inv["pulses_per_kwh"] * 1000)      # convert pulses to Wh
+                power = int(watts / (now - self.last_retrieved) * 3600) # calculate avg power production in Wh
 
             res.append({
                 "watts": watts,
