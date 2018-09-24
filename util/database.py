@@ -106,53 +106,37 @@ class Database():
         ''' % inverter['serial_id']
         self.c.execute(query)
         row = self.c.fetchone()
-        if row[0] is not None and row[1] is not None and self.is_timestamps_from_same_day(ts, row[0]):
-            return row[1]
-        else: return 0 # is new day or has no previous data
+        if row[0] is not None and row[1] is not None:           # if entry exists
+            if self.is_timestamps_from_same_day(ts, row[0]):    # if last etoday is from today
+                return row[1]
+            else:                                               # if last etoday is NOT from today
+                yesterday_yield = row[1]
+                self.add_month_data_row(inverter, yesterday_yield)
+                return 0                                        # reset etoday
+        else: return 0                                          # is new day or has no previous data
 
-    def add_month_data_rows(self, data):
+    def add_month_data_row(self, inverter, yesterday_yield):
+        inv_serial = inverter['serial_id']
 
-        for d in data:
-            inv_serial = d['inverter']['serial_id']
-            y = datetime.now() - timedelta(days=1)
-            yesterday_start, yesterday_end = self.get_epoch_day(y)
+        y = datetime.now() - timedelta(days=1)
+        y_start, y_end = self.get_epoch_day(y)
+        y_ts = int(datetime(y.year, y.month, y.day, 23, tzinfo=pytz.utc).timestamp())
 
-            query = '''
-                 SELECT * 
-                 FROM MonthData 
-                 WHERE Serial = %s AND TimeStamp BETWEEN %s AND %s;
-             ''' % (inv_serial, yesterday_start, yesterday_end)
-            self.c.execute(query)
+        query = '''
+            INSERT INTO MonthData (
+                TimeStamp,
+                Serial,
+                DayYield,
+                TotalYield                                 
+            ) VALUES (
+                %s,
+                %s,
+                %s,
+                (SELECT MAX(TotalYield) FROM DayData WHERE Serial = %s AND TimeStamp BETWEEN %s AND %s)
+            );
+        ''' % (y_ts, inv_serial, yesterday_yield, inv_serial, y_start, y_end)
 
-            if self.c.fetchone() is None:  # entry is missing
-
-                y_ts = int(datetime(y.year, y.month, y.day, 23, tzinfo=pytz.utc).timestamp())
-
-                query = '''
-                     SELECT SUM(Power) FROM DayData WHERE Serial = %s AND TimeStamp BETWEEN %s AND %s;
-                 ''' % (inv_serial, yesterday_start, yesterday_end)
-                self.c.execute(query)
-                sum_power = 0
-                fetched = self.c.fetchone()[0]
-                if fetched is not None:
-                    sum_power = fetched / 60 * 5  # normalize 5 min power back to hour
-
-                query = '''
-                     INSERT INTO MonthData (
-                         TimeStamp,
-                         Serial,
-                         TotalYield,
-                         DayYield
-                     ) VALUES (
-                         %s,
-                         %s,
-                         (SELECT MAX(TotalYield) FROM DayData WHERE Serial = %s AND TimeStamp BETWEEN %s AND %s),
-                         %s
-                     );
-                 ''' % (y_ts, inv_serial, inv_serial, yesterday_start, yesterday_end, sum_power)
-
-                self.c.execute(query)
-
+        self.c.execute(query)
         self.db.commit()
 
     def is_timestamps_from_same_day(self, ts1, ts2):

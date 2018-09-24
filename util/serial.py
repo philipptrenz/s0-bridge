@@ -17,6 +17,8 @@ class Serial:
             timeout=self.serial_config["timeout"]
         )
 
+        self.get_power_since_last_request()
+
     def read_serial(self):
         try:
             self.conn.write(bytearray('t','ascii')) # trigger arduino to report total data

@@ -30,7 +30,6 @@ if __name__ == '__main__':
     print('S0 SBFspot bridge started \n')
 
     # initialize
-    ser.get_power_since_last_request()
     db.add_inverters()
 
     try:
