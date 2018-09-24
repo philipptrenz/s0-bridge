@@ -10,7 +10,6 @@ def roundup(x):
     return int(math.ceil(x / 100.0)) * 100
 
 def collect_data(db, ts):
-    print('Collecting data ...')
     ts_log = roundup(ts)
 
     # serial data
@@ -30,7 +29,8 @@ if __name__ == '__main__':
 
     print('S0 SBFspot bridge started \n')
 
-    print('Adding inverters')
+    # initialize
+    ser.get_power_since_last_request()
     db.add_inverters()
 
     print('Waiting to retrieve data ...')
