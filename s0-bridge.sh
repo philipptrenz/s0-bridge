@@ -14,7 +14,7 @@
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-NAME=sunportal
+NAME=s0-bridge
 DIR=/home/pi/s0-bridge
 DAEMON=$DIR/s0-bridge.py
 DAEMONARGS=""
