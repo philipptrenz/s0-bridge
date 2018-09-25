@@ -15,9 +15,8 @@ def collect_data(db, ts):
     # serial data
     new_serial_data = ser.get_power_since_last_request()
     db.add_day_data_rows(ts_log, new_serial_data)
-    #db.add_month_data_rows(new_serial_data)
 
-    print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
+    #print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
 
 
 

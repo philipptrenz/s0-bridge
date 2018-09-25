@@ -9,7 +9,7 @@
             "timeout": 1,
 			"interfaces": [
 				{
-					"serial_id": "0000000001",
+					"serial_id": "1000000001",
 					"name": "My Power Plant",
 					"type": "inverter",
 					"prev_etotal": 0,

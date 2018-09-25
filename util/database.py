@@ -19,11 +19,15 @@ class Database():
 
                 query = '''
                     INSERT OR IGNORE INTO Inverters (
-                        Serial
+                        Serial,
+                        EToday,
+                        ETotal
                     ) VALUES (
+                        %s,
+                        %s,
                         %s
                     );
-                ''' % (inv["serial_id"])
+                ''' % (inv["serial_id"], 0, inv["prev_etotal"])
                 self.c.execute(query)
 
                 query = '''
@@ -40,24 +44,14 @@ class Database():
 
                 self.db.commit()
 
-    def update_inverter(self, serial, ts, status, etoday, etotal):
-        query = '''
-            UPDATE Inverters
-            SET     
-                TimeStamp='%s', 
-                Status='%s', 
-                eToday='%s',
-                eTotal='%s'
-            WHERE Serial='%s';
-        ''' % (ts, status, etoday, etotal, serial)
-        self.c.execute(query)
-
     def add_day_data_rows(self, ts, data):
         for d in data:
-            prev_total_yield = self.get_previous_total_yield(d["inverter"])
-            new_total_yield = prev_total_yield + d['watts']
-            prev_todays_yield = self.get_previous_todays_yield(ts, d['inverter'])
-            new_todays_yield = prev_todays_yield + d['watts']
+
+            if d['power'] < 1: continue # dont log 0 values
+            inv_serial = d['inverter']['serial_id']
+            last_ts, etoday, etotal = self.get_previous_yields(inv_serial)
+
+            new_etotal = etotal + d['watts']
 
             query = '''
                INSERT INTO DayData (
@@ -71,55 +65,47 @@ class Database():
                    %s,
                    %s
                );
-            ''' % (ts, d['inverter']['serial_id'], d['power'], new_total_yield)
+            ''' % (ts, inv_serial, d['power'], new_etotal)
             self.c.execute(query)
 
-            status = 'OK' # TODO
+            status = 'OK' # TODO: Get actual status value
 
-            self.update_inverter(d['inverter']['serial_id'], ts, status, new_todays_yield, (prev_total_yield + d['watts']))
+            if self.is_timestamps_from_same_day(last_ts, ts):
+                self.update_inverter(inv_serial, ts, status, etoday + d['watts'], new_etotal)
+            else:   # is new day
+                self.update_inverter(inv_serial, ts, status, d['watts'], new_etotal)
+                self.add_month_data_row(inv_serial, ts, etoday, etotal)
 
         self.db.commit()
 
-    def get_previous_total_yield(self, inverter):
-        # get power of last data point
-        query = '''
-           SELECT TotalYield 
-           FROM DayData
-           WHERE TimeStamp = (
-               SELECT MAX(TimeStamp)
-               FROM DayData
-               WHERE Serial = %s
-           )
-        '''
-        self.c.execute(query % (inverter['serial_id']))
-        prev_datapoint = self.c.fetchone()
-        if prev_datapoint is not None:
-            return prev_datapoint[0]
-        else:
-            return inverter['prev_etotal']
 
-    def get_previous_todays_yield(self, ts, inverter):
+    def get_previous_yields(self, inverter_serial):
         query = '''
-            SELECT TimeStamp, EToday
-            FROM Inverters
-            WHERE Serial = %s;
-        ''' % inverter['serial_id']
+           SELECT TimeStamp, EToday, ETotal
+           FROM Inverters
+           WHERE Serial = '%s'
+        ''' % (inverter_serial)
         self.c.execute(query)
-        row = self.c.fetchone()
-        if row[0] is not None and row[1] is not None:           # if entry exists
-            if self.is_timestamps_from_same_day(ts, row[0]):    # if last etoday is from today
-                return row[1]
-            else:                                               # if last etoday is NOT from today
-                yesterday_yield = row[1]
-                self.add_month_data_row(inverter, yesterday_yield)
-                return 0                                        # reset etoday
-        else: return 0                                          # is new day or has no previous data
+        data = self.c.fetchone()
+        return data[0], data[1], data[2]
 
-    def add_month_data_row(self, inverter, yesterday_yield):
-        inv_serial = inverter['serial_id']
+    def update_inverter(self, inverter_serial, ts, status, etoday, etotal):
+        query = '''
+            UPDATE Inverters
+            SET     
+                TimeStamp='%s', 
+                Status='%s', 
+                eToday='%s',
+                eTotal='%s'
+            WHERE Serial='%s';
+        ''' % (ts, status, etoday, etotal, inverter_serial)
+        self.c.execute(query)
 
-        y = datetime.now() - timedelta(days=1)
-        y_start, y_end = self.get_epoch_day(y)
+    def add_month_data_row(self, inverter_serial, ts, etoday, etotal):
+
+        print('MonthData', '\t', datetime.fromtimestamp(ts).strftime("%y-%m-%d %H:%M"), '\t', test_ts, '\t', etoday, '\t',
+              etotal)
+        y = datetime.fromtimestamp(ts) - timedelta(days=1)
         y_ts = int(datetime(y.year, y.month, y.day, 23, tzinfo=pytz.utc).timestamp())
 
         query = '''
@@ -132,12 +118,10 @@ class Database():
                 %s,
                 %s,
                 %s,
-                (SELECT MAX(TotalYield) FROM DayData WHERE Serial = %s AND TimeStamp BETWEEN %s AND %s)
+                %s
             );
-        ''' % (y_ts, inv_serial, yesterday_yield, inv_serial, y_start, y_end)
-
+        ''' % (y_ts, inverter_serial, etoday, etotal)
         self.c.execute(query)
-        self.db.commit()
 
     def is_timestamps_from_same_day(self, ts1, ts2):
         d1 = datetime.fromtimestamp(ts1)
@@ -173,20 +157,44 @@ class Database():
         self.db.close()
 
 if __name__ == '__main__':
-    print('nothing to do here')
+    #print('nothing to do here')
 
-    #print(datetime(2018,9,15, 0, tzinfo=pytz.utc).timestamp())
+    import random, time
+    from config import Config
 
+    cfg = Config(config_path='../config.json')
+    db  = Database(cfg)
 
+    db.add_inverters()
 
-    s = datetime(2018,9,13, 0, tzinfo=pytz.utc)
-    epoch_start = int(datetime(2018,9,15, 00, 00, 00, tzinfo=pytz.utc).timestamp())
-    epoch_end = int(datetime(2018,9,15, 23, 59, 59, tzinfo=pytz.utc).timestamp())
-    print(epoch_start, epoch_end)
+    test_ts = 1535932800
 
-    i = 1537781571
-    d = datetime.fromtimestamp(i)
-    print(d)
+    print(test_ts)
+
+    while True:
+
+        test_ts += 300
+        test_date = datetime.fromtimestamp(test_ts)
+
+        if test_date.hour in range(0, 8) or test_date.hour in range(18, 24): continue
+
+        watts = random.randint(50, 400)
+        test_data = [{
+            'watts': int(watts),
+            'power': int(watts / 5*60),
+            'inverter': {
+                "serial_id": "1000000001",
+                "name": "TEST PLANT",
+                "type": "inverter",
+                "prev_etotal": 62,
+                "pulses_per_kwh": 1000
+            }
+        }]
+
+        db.add_day_data_rows(test_ts, test_data)
+        print(test_date.strftime("%y-%m-%d %H:%M"), '\t', test_ts, '\t', test_data[0]['watts'], '\t', test_data[0]['power'])
+
+        time.sleep(0.1)
 
 
 
