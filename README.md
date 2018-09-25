@@ -7,7 +7,12 @@ This project uses a Raspberry Pi running SBFspot which carries an Arduino Pro Mi
 **NOTE**: The used circuit provides a voltage of 5VDC to the S0 interface of a connected power meter. This may not be sufficient for every S0 interface. The circuit diagram can certainly be adjusted accordingly the specs of any S0-enabled power meter, but I will not provide any support therefore. However, it works well with the _Eltako DSZ15D_ for example.
 
 
-## How to use
+## Hardware and wiring
+
+
+![Arduino Pro Mini 3.3V breadboard](arduino/s0-bridge_breadboard.png?raw=true "Title")
+
+## Software
 
 ### Install dependencies
 
