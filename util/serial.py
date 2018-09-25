@@ -39,19 +39,19 @@ class Serial:
         self.prev_values = new_values
 
         res = []
-        for idx, inv in enumerate(self.interfaces):
+        for idx, source in enumerate(self.interfaces):
 
             power = 0
             watts = 0
             if self.last_retrieved != 0:
                 pulses = diff[idx]
-                watts = int(pulses / inv["pulses_per_kwh"] * 1000)      # convert pulses to Wh
+                watts = int(pulses / source["pulses_per_kwh"] * 1000)      # convert pulses to Wh
                 power = int(watts / (now - self.last_retrieved) * 3600) # calculate avg power production in Wh
 
             res.append({
                 "watts": watts,
                 "power": power,
-                "inverter": inv
+                "source": source
             })
 
         self.last_retrieved = now
