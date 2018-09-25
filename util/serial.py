@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import time, serial, json, random
+import time, serial, json
 
 class Serial:
 

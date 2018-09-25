@@ -13,7 +13,7 @@ This project uses a Raspberry Pi running SBFspot which carries an Arduino Pro Mi
 
 ```bash
 sudo apt install python3 python3-pip
-sudo pip3 install sqlite3 pyserial pytz
+sudo pip3 install pyserial pytz
 ```
 
 ### Enable Pis serial interface

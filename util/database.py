@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
 """
-import sqlite3, json, pytz
+import sqlite3, pytz
 from datetime import datetime, timedelta
 
 
