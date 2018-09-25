@@ -10,7 +10,7 @@ This project uses a Raspberry Pi running SBFspot which carries an Arduino Pro Mi
 ## Hardware and wiring
 
 
-![Arduino Pro Mini 3.3V breadboard](arduino/s0-bridge_breadboard.png?raw=true "Title")
+![Arduino Pro Mini 3.3V breadboard](arduino/s0-bridge_breadboard.png?raw=true | width=100)
 
 ## Software
 
