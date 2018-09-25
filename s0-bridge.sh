@@ -16,7 +16,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 NAME=sunportal
 DIR=/home/pi/s0-bridge
-DAEMON=$DIR/bridge.py
+DAEMON=$DIR/s0-bridge.py
 DAEMONARGS=""
 PIDFILE=/var/run/$NAME.pid
 LOGFILE=/var/log/$NAME.log
