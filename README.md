@@ -13,6 +13,8 @@ The following parts are needed:
 * 2k2Ω and 3k3Ω resistors for voltage division (5V to 3.3V)
 * optional: skrew terminals
 
+Also check out my [sunportal](https://github.com/philipptrenz/sunportal) project providing a web based visualisation of SBFspot data!
+
 ## Flashing the Arduino Pro Mini
 
 Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini using the Arduino IDE and a USB-to-TTL adapter.
