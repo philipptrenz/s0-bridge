@@ -48,7 +48,7 @@ The project includes the following config file in json format:
 		"serial": {
 			"path": "/dev/serial0",
 			"baudrate": 115200,
-            "timeout": 1,
+			"timeout": 1,
 			"interfaces": [
 				{
 					"serial_id": "1000000001",
