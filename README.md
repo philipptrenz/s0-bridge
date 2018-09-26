@@ -90,7 +90,7 @@ sudo chmod 755 s0-bridge.sh
 # add the bash script to the service folder
 sudo cp s0-bridge.sh /etc/init.d/s0-bridge
 sudo update-rc.d s0-bridge defaults
-```
+``` 
 
 ## Hardware and wiring
 
