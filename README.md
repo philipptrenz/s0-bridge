@@ -19,13 +19,6 @@ Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini using the Arduino IDE 
 
 ## Software for the Raspberry Pi
 
-### Install dependencies
-
-```bash
-sudo apt install python3 python3-pip
-sudo pip3 install pyserial pytz
-```
-
 ### Enable Pis serial interface
  
  1. Enter `sudo raspi-config`
@@ -35,13 +28,60 @@ sudo pip3 install pyserial pytz
  1. Enable serial port hardware
  1. Reboot the Pi
 
-### Start the bridge
+### Install dependencies
+
+```bash
+sudo apt install python3 python3-pip
+sudo pip3 install pyserial pytz
+```
+
+### Configure _s0-bridge_
+
+The project includes the following config file in json format:
+
+```json
+{
+	"database": {
+		"path": "/home/pi/smadata/SBFspot.db"
+	},
+	"data_interfaces": {
+		"serial": {
+			"path": "/dev/serial0",
+			"baudrate": 115200,
+   "timeout": 1,
+			"interfaces": [
+				{
+					"serial_id": "1000000001",
+					"name": "My Power Plant",
+					"type": "inverter",
+					"prev_etotal": 0,
+					"pulses_per_kwh": 1000
+				}
+			]
+		},
+		"network": {
+			"interfaces": []
+		}
+	}
+}
+```
+
+To edit it to your needs copy the file to `config.json`:
+
+```bash
+cp config.default.json config.json
+```
+
+Under `data_interfaces.serial.interfaces` has to be a json object for each s0 interface in the same order as connected to the Pro Mini. Available types are `inverter` and `consumption`, `serial_id` and `name` can be chosen freely. With `prev_etotal` the previous power production or consumption can be added in Wh and `pulses_per_kwh` has to be set accordingly the specs of the connected power meter.
+
+### Start _s0-bridge_
 
 ```python
 python3 s0-bridge.py
 ```
 
-To run _s0-bridge_ on boot:
+### Run _s0-bridge_ on boot
+
 ```bash
 # make the scripts executable
 sudo chmod 755 s0-bridge.py
