@@ -49,7 +49,7 @@ class Serial:
                 power = int(watts / (now - self.last_retrieved) * 3600) # calculate avg power production in Wh
 
             res.append({
-                "watts": watts,
+                "energy": watts,
                 "power": power,
                 "source": source
             })

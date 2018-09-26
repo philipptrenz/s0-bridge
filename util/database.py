@@ -48,6 +48,7 @@ class Database():
         for data in data_points:
 
             if data['power'] < 1:  continue    # skip 0 values
+
             data_type = data['source']['type']
 
             if data_type == 'inverter':
@@ -56,8 +57,7 @@ class Database():
 
             elif data_type == 'consumption':
 
-                # TODO: Implement consumption logging
-                raise Exception('Processing consumption data not yet implemented')
+                self.add_consumption_data_row(ts, data['energy'], data['power'])
 
     def add_inverter_data(self, ts, data):
 
@@ -67,9 +67,9 @@ class Database():
 
         self.add_day_data_row(ts, data, prev_ts, prev_etoday, prev_etotal)
         if self.is_timestamps_from_same_day(prev_ts, ts):
-            self.update_inverter(inv_serial, ts, status, prev_etoday + data['watts'],  prev_etotal + data['watts'])
+            self.update_inverter(inv_serial, ts, status, prev_etoday + data['energy'],  prev_etotal + data['energy'])
         else:   # is new day
-            self.update_inverter(inv_serial, ts, status, data['watts'],  prev_etotal + data['watts'])
+            self.update_inverter(inv_serial, ts, status, data['energy'],  prev_etotal + data['energy'])
             self.add_month_data_row(inv_serial, ts, prev_etoday, prev_etotal)
 
         self.db.commit()
@@ -88,7 +88,7 @@ class Database():
                %s,
                %s
            );
-        ''' % (ts, inv_serial, data['power'],  prev_etotal + data['watts'])
+        ''' % (ts, inv_serial, data['power'],  prev_etotal + data['energy'])
         self.c.execute(query)
 
 
@@ -134,6 +134,33 @@ class Database():
         ''' % (y_ts, inverter_serial, etoday, etotal)
         self.c.execute(query)
 
+    def add_consumption_data_row(self, ts, energy_used, power_used):
+
+        query = '''
+            INSERT OR IGNORE INTO Consumption (
+                TimeStamp,
+                EnergyUsed,
+                PowerUsed                                
+            ) VALUES (
+                %s,
+                %s,
+                %s
+            );
+        ''' % (ts, 0, 0)
+        self.c.execute(query)
+
+        query = '''
+            UPDATE Consumption SET 
+            EnergyUsed = EnergyUsed + %s,
+            PowerUsed = PowerUsed + %s
+            WHERE TimeStamp = %s;
+        ''' % (energy_used, power_used, ts)
+
+        self.c.execute(query)
+
+        self.db.commit()
+
+
     def is_timestamps_from_same_day(self, ts1, ts2):
         d1 = datetime.fromtimestamp(ts1)
         d2 = datetime.fromtimestamp(ts2)
@@ -165,20 +192,31 @@ if __name__ == '__main__':
         if test_date.hour in range(0, 8) or test_date.hour in range(18, 24): continue
 
         watts = random.randint(50, 400)
-        test_data = [{
-            'watts': int(watts),
-            'power': int(watts / 5*60),
-            'source': {
-                "serial_id": "1000000001",
-                "name": "TEST PLANT",
-                "type": "inverter",
-                "prev_etotal": 62,
-                "pulses_per_kwh": 1000
+        test_data = [
+            {
+                'energy': int(watts),
+                'power': int(watts / 5*60),
+                'source': {
+                    "serial_id": "1000000001",
+                    "name": "TEST PLANT",
+                    "type": "inverter",
+                    "prev_etotal": 62,
+                    "pulses_per_kwh": 1000
+                }
+            },
+            {
+                'energy': int(watts),
+                'power': int(watts / 5 * 60),
+                'source': {
+                    "serial_id": "1000000002",
+                    "name": "TEST CONSUMPTION COUNTER",
+                    "type": "consumption"
+                }
             }
-        }]
+        ]
 
         db.add_data(test_ts, test_data)
-        print(test_date.strftime("%y-%m-%d %H:%M"), '\t', test_ts, '\t', test_data[0]['watts'], '\t', test_data[0]['power'])
+        print(test_date.strftime("%y-%m-%d %H:%M"), '\t', test_ts, '\t', test_data[0]['energy'], '\t', test_data[0]['power'])
 
         time.sleep(0.1)
 
