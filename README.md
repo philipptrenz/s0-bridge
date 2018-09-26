@@ -4,10 +4,20 @@ Include your power consumption as well as non Bluetooth(R) or Speedwire enabled 
 
 This project uses a Raspberry Pi running SBFspot which carries an Arduino Pro Mini 3.3V piggyback to collect S0 pulses from power meters.
 
-**NOTE**: The used circuit provides a voltage of 5VDC to the S0 interface of a connected power meter. This may not be sufficient for every S0 interface. The circuit diagram can certainly be adjusted accordingly the specs of any S0-enabled power meter, but I will not provide any support therefore. However, it works well with the _Eltako DSZ15D_ for example.
+The following parts are needed:
 
+* Raspberry Pi (3)
+* Arduino Pro Mini 3.3V (Clone)
+* USB-to-TTL adapter supporting 3.3V and having a DTR pin 
+* Breadboard and jumper wires
+* 2k2Ω and 3k3Ω resistors for voltage division (5V to 3.3V)
+* optional: skrew terminals
 
-## Software
+## Flashing the Arduino Pro Mini
+
+Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini using the Arduino IDE and a USB-to-TTL adapter.
+
+## Software for the Raspberry Pi
 
 ### Install dependencies
 
@@ -44,14 +54,13 @@ sudo update-rc.d s0-bridge defaults
 
 ## Hardware and wiring
 
-Parts needed:
-
-* Raspberry Pi 3
-* Arduino Pro Mini 3.3V (Clone)
-* 2k2Ω and 3k3Ω resistors
-* Breadboard and wires
+Wire the Arduino Pro Mini to the Raspberry Pi as shown below:
 
 <img src="arduino/s0-bridge_breadboard.png?raw=true" alt="Arduino Pro Mini 3.3V breadboard"  width="500">
+
+The Arduino Sketch supports up to three S0 inputs (on pins 2, 3 and 4), but can easily be extended.
+
+**NOTE**: The circuit provides a voltage of 5VDC to the S0 interface of a connected power meter. This may not be sufficient for every S0 interface. The circuit diagram can certainly be adjusted accordingly the specs of any S0-enabled power meter, but I will not provide any support therefore. However, it works well with the _Eltako DSZ15D_ for example.
 
 ## Disclaimer 
 
