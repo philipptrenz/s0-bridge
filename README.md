@@ -33,7 +33,7 @@ Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini using the Arduino IDE 
 ```bash
 sudo apt install python3 python3-pip
 sudo pip3 install pyserial pytz
-```
+``` 
 
 ### Configure _s0-bridge_
 
