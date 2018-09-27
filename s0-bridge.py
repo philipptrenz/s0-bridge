@@ -5,17 +5,19 @@ from datetime import datetime
 from util.config import Config
 from util.database import Database
 from util.serial  import Serial
+from util.network import Network
 
 
 class S0_Bridge:
 
     def __init__(self):
 
-        print('#####################\n# S0 SBFspot bridge #\n#####################')
+        print('###########################\n#    S0 SBFspot bridge    #\n###########################')
 
         self.cfg = Config()
         self.db = Database(self.cfg)
         self.ser = Serial(self.cfg)
+        self.ntwrk = Network(self.cfg)
 
 
     def start(self):
@@ -50,9 +52,15 @@ class S0_Bridge:
         ts_log = self.roundup(ts)
 
         # serial data
-        new_serial_data = self.ser.get_power_since_last_request()
-        db.add_data(ts_log, new_serial_data)
-        self.cfg.log( 'added new data from serial interface')
+        if self.ser.is_enabled:
+            new_serial_data = self.ser.get_power_since_last_request()
+            db.add_data(ts_log, new_serial_data)
+            self.cfg.log('added new data from serial interface')
+
+        if self.ntwrk.is_enabled:
+            new_network_data = self.ntwrk.get_power_since_last_request()
+            db.add_data(ts_log, new_network_data)
+            self.cfg.log('added new data from network interfaces')
 
         # print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
 

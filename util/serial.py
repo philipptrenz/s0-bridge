@@ -9,6 +9,8 @@ class Serial:
         self.serial_config = config.get_serial_config()
         self.interfaces = self.serial_config["interfaces"]
         self.timeout = self.serial_config["timeout"]
+        self.is_enabled = self.serial_config["enabled"]
+
         self.prev_values = [0] * len( self.interfaces )
         self.last_retrieved = 0
 
@@ -18,7 +20,8 @@ class Serial:
             timeout=self.serial_config["timeout"]
         )
 
-        self.get_power_since_last_request(True)
+        if self.is_enabled:
+            self.get_power_since_last_request(True)
 
     def read_serial(self):
         self.conn.write(bytearray('t','ascii')) # trigger arduino to report total data

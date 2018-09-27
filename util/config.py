@@ -35,6 +35,9 @@ class Config():
     def get_serial_config(self):
         return self.config["data_interfaces"]["serial"]
 
+    def get_network_config(self):
+        return self.config["data_interfaces"]["network"]
+
     def get_connection_interfaces(self):
         interfaces = list()
         if "interfaces" in self.config["data_interfaces"]["serial"]:
