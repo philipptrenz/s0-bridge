@@ -1,14 +1,8 @@
 # s0-bridge
 
-Include your power consumption as well as non Bluetooth(R) or Speedwire enabled solar inverters into a SBFspot 
-database by using power meters with S0 interface.
+Include your power consumption as well as non Bluetooth(R) or Speedwire enabled solar inverters into a SBFspot database by using power meters with S0 interface.
 
-Modern solar power inverters from the manufacturer SMA are equipped with ethernet or Bluetooth(R) interfaces. Therefore  
-[SBFspot](https://github.com/SBFspot/SBFspot) provides a nice way to collect parameters and energy production of these 
-devices. This project provides a way to collect production data of non-ethernet or Bluetooth(R) enabled inverters, also 
-from different manufacturers, as well as energy consumption. This data is collected by using electricity meters with 
-S0 interfaces, which are read by microcontrollers. These communicate with a Raspberry Pi via serial interface (cable) 
-or WiFi, the Raspberry Pi stores the data in the database of SBFspot.
+Modern solar power inverters from the manufacturer SMA are equipped with ethernet or Bluetooth(R) interfaces. Therefore [SBFspot](https://github.com/SBFspot/SBFspot) provides a nice way to collect parameters and energy production of these devices. This project provides a way to collect production data of non-ethernet or Bluetooth(R) enabled inverters, also from different manufacturers, as well as energy consumption. This data is collected by using electricity meters with S0 interfaces, which are read by microcontrollers. These communicate with a Raspberry Pi via serial interface (cable) or WiFi, the Raspberry Pi stores the data in the database of SBFspot.
 
 The following parts are needed:
 
@@ -23,17 +17,13 @@ If you like my project and want to keep me motivated:
 
 <a href='https://ko-fi.com/U7U6COXD' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
-Also check out my [sunportal](https://github.com/philipptrenz/sunportal) project providing a web based visualisation 
-of SBFspot data!
+Also check out my [sunportal](https://github.com/philipptrenz/sunportal) project providing a web based visualisation of SBFspot data!
 
 ## Software for the Microcontroller
 
-Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini or if you want 
-to use the ESP8266 NodeMCU use `arduino/sketch_s0_wifi.ino`. Both Microcontrollers get flashed by  
-using the Arduino IDE, there are many tutorials out there showing how.
+Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini or if you want to use the ESP8266 NodeMCU use `arduino/sketch_s0_wifi.ino`. Both Microcontrollers get flashed by using the Arduino IDE, there are many tutorials out there showing how.
 
-**NOTE:** It's important to have the 3.3V version of the Arduino Pro Mini to communicate directly to the Raspberry 
-Pis UART interface. If you insist to use a 5V Arduino this can be done using a voltage level shifter.
+**NOTE:** It's important to have the 3.3V version of the Arduino Pro Mini to communicate directly to the Raspberry Pis UART interface. If you insist to use a 5V Arduino this can be done using a voltage level shifter.
 
 
 ## Software for the Raspberry Pi
