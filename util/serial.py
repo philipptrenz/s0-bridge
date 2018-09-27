@@ -5,6 +5,7 @@ import time, serial, json
 class Serial:
 
     def __init__(self, config):
+        self.cfg = config
         self.serial_config = config.get_serial_config()
         self.interfaces = self.serial_config["interfaces"]
         self.timeout = self.serial_config["timeout"]
@@ -17,22 +18,32 @@ class Serial:
             timeout=self.serial_config["timeout"]
         )
 
-        self.get_power_since_last_request()
+        self.get_power_since_last_request(True)
 
     def read_serial(self):
-        try:
-            self.conn.write(bytearray('t','ascii')) # trigger arduino to report total data
-            while (self.conn.inWaiting() == 0):
-               time.sleep(0.001)
-            data = self.conn.readline().decode("utf-8")
-            return json.loads(data) # parse string result as json
-        except Exception as e:
-            print('Serial: timeout exception,',e)
-            return [0] * len( self.interfaces )
+        self.conn.write(bytearray('t','ascii')) # trigger arduino to report total data
+        while (self.conn.inWaiting() == 0):
+           time.sleep(0.001)
+        raw_data = self.conn.readline()
+        data = raw_data.decode("utf-8")
 
-    def get_power_since_last_request(self):
+        if data == '' or data == 't':
+            raise Exception('serial: no data received, serial timeout')
+
+        json_obj = json.loads(data)
+        return json_obj # parse string result as json
+
+    def get_power_since_last_request(self, initial_request=False):
         diff = [0] * len(self.interfaces)
-        new_values = self.read_serial()[0:len(self.interfaces)]
+        new_values = []
+
+        try:
+            new_values = self.read_serial()[0:len(self.interfaces)]
+        except Exception as e:
+
+            if not initial_request: self.cfg.log(e)
+            new_values = [0] * len( self.interfaces )
+
         now = time.time()
         if not self.last_retrieved == 0:
             diff = [i - j for i, j in zip(new_values, self.prev_values)] # Pulses since last retrieval

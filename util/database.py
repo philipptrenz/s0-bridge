@@ -216,7 +216,7 @@ if __name__ == '__main__':
         ]
 
         db.add_data(test_ts, test_data)
-        print(test_date.strftime("%y-%m-%d %H:%M"), '\t', test_ts, '\t', test_data[0]['energy'], '\t', test_data[0]['power'])
+        print(test_date.strftime("%y-%m-%d %H:%M:%S"), '\t', test_ts, '\t', test_data[0]['energy'], '\t', test_data[0]['power'])
 
         time.sleep(0.1)
 

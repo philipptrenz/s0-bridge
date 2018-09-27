@@ -1,49 +1,67 @@
 #!/usr/bin/env python3
-import time as t, math
+import time as t, math, sys
 from datetime import datetime
 
 from util.config import Config
 from util.database import Database
 from util.serial  import Serial
 
-def roundup(x):
-    return int(math.ceil(x / 100.0)) * 100
 
-def collect_data(db, ts):
-    ts_log = roundup(ts)
+class S0_Bridge:
 
-    # serial data
-    new_serial_data = ser.get_power_since_last_request()
-    db.add_data(ts_log, new_serial_data)
+    def __init__(self):
 
-    #print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
+        print('#####################\n# S0 SBFspot bridge #\n#####################')
 
+        self.cfg = Config()
+        self.db = Database(self.cfg)
+        self.ser = Serial(self.cfg)
+
+
+    def start(self):
+
+        self.cfg.log('started')
+
+        # initialize
+        self.cfg.log('adding inverters')
+        self.db.add_inverters()
+
+        self.cfg.log('starting timed data collection (every 5 minutes)')
+        try:
+            while True:
+                ts = datetime.now().timestamp()
+                # before minute of time is a multiple of 5 minutes
+                if (int(ts) % 300) == 299:
+                    self.cfg.log('collecting new data')
+                    self.collect_data(self.db, ts)
+                t.sleep(1)
+
+        except KeyboardInterrupt:
+            print('Shutting down')
+        except Exception as e:
+            print('Error occured', e)
+        finally:
+            self.db.close()
+            self.ser.close()
+            sys.exit(1)
+
+
+    def collect_data(self, db, ts):
+        ts_log = self.roundup(ts)
+
+        # serial data
+        new_serial_data = self.ser.get_power_since_last_request()
+        db.add_data(ts_log, new_serial_data)
+        self.cfg.log( 'added new data from serial interface')
+
+        # print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
+
+
+    def roundup(self, x):
+        return int(math.ceil(x / 100.0)) * 100
 
 
 if __name__ == '__main__':
 
-    config = Config()
-    db = Database(config)
-    ser = Serial(config)
-
-    print('S0 SBFspot bridge started \n')
-
-    # initialize
-    db.add_inverters()
-
-    try:
-
-        while True:
-            ts =  datetime.now().timestamp()
-            # before minute of time is a multiple of 5 minutes
-            if (int(ts) % 300) == 299:
-                collect_data(db, ts)
-            t.sleep(1)
-
-    except KeyboardInterrupt:
-        print('Shutting down')
-    except Exception as e:
-        print('Error occured', e)
-    finally:
-        db.close()
-        ser.close()
+    bridge = S0_Bridge()
+    bridge.start()

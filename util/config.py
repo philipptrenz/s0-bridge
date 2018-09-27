@@ -2,6 +2,7 @@
 """
 """
 import json, os.path
+from datetime import datetime
 
 class Config():
 
@@ -41,3 +42,8 @@ class Config():
         if "interfaces" in self.config["data_interfaces"]["network"]:
             interfaces.extend(self.config["data_interfaces"]["network"]["interfaces"])
         return interfaces
+
+    def log(self, msg, error=''):
+        ts = datetime.now()
+        if error: print(ts, '|', msg, '['+str(error)+']')
+        else: print(ts, '|', msg)
