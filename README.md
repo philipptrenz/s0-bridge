@@ -15,6 +15,10 @@ The following parts are needed:
 
 Also check out my [sunportal](https://github.com/philipptrenz/sunportal) project providing a web based visualisation of SBFspot data!
 
+If you like my project and want to keep me motivated:
+
+<a href='https://ko-fi.com/U7U6COXD' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 ## Flashing the Arduino Pro Mini
 
 Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini using the Arduino IDE and a USB-to-TTL adapter.
@@ -86,8 +90,7 @@ python3 s0-bridge.py
 
 ```bash
 # make the scripts executable
-sudo chmod 755 s0-bridge.py
-sudo chmod 755 s0-bridge.sh
+sudo chmod 755 s0-bridge.*
 
 # add the bash script to the service folder
 sudo cp s0-bridge.sh /etc/init.d/s0-bridge
