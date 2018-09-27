@@ -19,9 +19,12 @@ If you like my project and want to keep me motivated:
 
 <a href='https://ko-fi.com/U7U6COXD' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
-## Flashing the Arduino Pro Mini
+## Software for the Arduino Pro Mini
 
 Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini using the Arduino IDE and a USB-to-TTL adapter.
+
+**NOTE:** It's important to have the 3.3V version of the Arduino Pro Mini to communicate directly to the Raspberry Pis UART interface. If you insist to use a 5V Arduino this can be done using a voltage level shifter.
+
 
 ## Software for the Raspberry Pi
 
