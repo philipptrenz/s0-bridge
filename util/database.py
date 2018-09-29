@@ -39,7 +39,7 @@ class Database():
                         Status='%s',
                         TimeStamp='%s'
                     WHERE Serial='%s';
-                ''' % (source["name"], "S0 bridge", "v0", "OK", int(datetime.now().timestamp()), source["serial_id"] )
+                ''' % (source["name"], source["inverter_type"], "s0-bridge v0", "OK", int(datetime.now().timestamp()), source["serial_id"] )
                 self.c.execute(query)
 
                 self.db.commit()
