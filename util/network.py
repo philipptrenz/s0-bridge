@@ -15,6 +15,8 @@ class Network:
         self.prev_values = [[]] * len(self.nodes)
         self.last_retrieved = [0] * len(self.nodes)
 
+        self.unsigned_long_max_size = 2 ** 32 - 1
+
         if self.is_enabled:
             self.get_power_since_last_request(True)
 
@@ -59,8 +61,13 @@ class Network:
                 self.prev_values[node_idx] = [0] * len(interfaces)
 
             now = time.time()
+
             if not self.last_retrieved[node_idx] == 0:
-                diff = [i - j for i, j in zip(new_values, self.prev_values[node_idx])] # Pulses since last retrieval
+                for idx in range(len(interfaces)):
+                    diff[idx] = new_values[idx] - self.prev_values[node_idx][idx]
+                    if new_values[idx] < self.prev_values[node_idx][idx]:  # arduino unsigned long overflow
+                        diff[idx] = self.unsigned_long_max_size - self.prev_values[node_idx][idx] + new_values[idx]
+
             self.prev_values[node_idx] = new_values
 
             for i_idx, source in enumerate(interfaces):

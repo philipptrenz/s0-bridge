@@ -14,6 +14,8 @@ class Serial:
         self.prev_values = [0] * len( self.interfaces )
         self.last_retrieved = 0
 
+        self.unsigned_long_max_size = 2**32-1
+
         self.conn = serial.Serial(
             port=self.serial_config["path"],
             baudrate=self.serial_config["baudrate"],
@@ -40,6 +42,8 @@ class Serial:
         diff = [0] * len(self.interfaces)
         new_values = []
 
+        if not initial_request: self.cfg.log('serial: collecting data from serial interface')
+
         try:
             new_values = self.read_serial()[0:len(self.interfaces)]
         except Exception as e:
@@ -49,6 +53,13 @@ class Serial:
 
         now = time.time()
         if not self.last_retrieved == 0:
+            for idx in range(len(self.interfaces)):
+                diff[idx] = new_values[idx] - self.prev_values[idx]
+                if new_values[idx] < self.prev_values[idx]: # arduino unsigned long overflow
+                    diff[idx] = self.unsigned_long_max_size - self.prev_values[idx] + new_values[idx]
+
+
+
             diff = [i - j for i, j in zip(new_values, self.prev_values)] # Pulses since last retrieval
         self.prev_values = new_values
 
