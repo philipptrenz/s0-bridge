@@ -68,8 +68,6 @@ class Serial:
                 watts = int(pulses / source["pulses_per_kwh"] * 1000)   # convert pulses to Wh
                 power = int(watts / (now - self.last_retrieved) * 3600) # calculate avg power production in Wh
 
-                print('seconds:', now-self.last_retrieved)
-
                 res.append({
                     "energy": watts,
                     "power": power,
