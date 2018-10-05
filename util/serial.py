@@ -47,38 +47,36 @@ class Serial:
         try:
             new_values = self.read_serial()[0:len(self.interfaces)]
         except Exception as e:
-
             if not initial_request: self.cfg.log(e)
             new_values = [0] * len( self.interfaces )
 
         now = time.time()
-        if not self.last_retrieved == 0:
-            for idx in range(len(self.interfaces)):
-                diff[idx] = new_values[idx] - self.prev_values[idx]
-                if new_values[idx] < self.prev_values[idx]: # arduino unsigned long overflow
-                    diff[idx] = self.unsigned_long_max_size - self.prev_values[idx] + new_values[idx]
-
-
-
-            diff = [i - j for i, j in zip(new_values, self.prev_values)] # Pulses since last retrieval
-        self.prev_values = new_values
 
         res = []
-        for idx, source in enumerate(self.interfaces):
+        if not self.last_retrieved == 0:
+            for idx, source in enumerate(self.interfaces):
 
-            power = 0
-            watts = 0
-            if self.last_retrieved != 0:
-                pulses = diff[idx]
-                watts = int(pulses / source["pulses_per_kwh"] * 1000)      # convert pulses to Wh
+                pulses = new_values[idx] - self.prev_values[idx]
+
+                # detect arduino const long overflow
+                # if new_value smaller than last_value and last_value closer than 1000 kWh to unsigned_long_max_size
+                if new_values[idx] != 0 \
+                    and new_values[idx] < self.prev_values[idx] \
+                    and (self.unsigned_long_max_size - self.prev_values[idx]) < (1000 * source["pulses_per_kwh"]):
+                    pulses = self.unsigned_long_max_size - self.prev_values[idx] + new_values[idx]
+
+                watts = int(pulses / source["pulses_per_kwh"] * 1000)   # convert pulses to Wh
                 power = int(watts / (now - self.last_retrieved) * 3600) # calculate avg power production in Wh
 
-            res.append({
-                "energy": watts,
-                "power": power,
-                "source": source
-            })
+                print('seconds:', now-self.last_retrieved)
 
+                res.append({
+                    "energy": watts,
+                    "power": power,
+                    "source": source
+                })
+
+        self.prev_values = new_values
         self.last_retrieved = now
         return res
 
