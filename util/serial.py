@@ -9,20 +9,20 @@ class Serial:
         self.serial_config = config.get_serial_config()
         self.interfaces = self.serial_config["interfaces"]
         self.timeout = self.serial_config["timeout"]
-        self.is_enabled = self.serial_config["enabled"]
+        self.is_enabled = self.serial_config["enabled"] == 'true'
 
         self.prev_values = [0] * len( self.interfaces )
         self.last_retrieved = 0
 
         self.unsigned_long_max_size = 2**32-1
 
-        self.conn = serial.Serial(
-            port=self.serial_config["path"],
-            baudrate=self.serial_config["baudrate"],
-            timeout=self.serial_config["timeout"]
-        )
-
         if self.is_enabled:
+
+            self.conn = serial.Serial(
+                port=self.serial_config["path"],
+                baudrate=self.serial_config["baudrate"],
+                timeout=self.serial_config["timeout"]
+            )
             self.get_power_since_last_request(True)
 
     def read_serial(self):

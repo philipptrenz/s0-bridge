@@ -10,7 +10,7 @@ class Network:
         self.cfg = config
         self.network_config = self.cfg.get_network_config()
         self.nodes = self.network_config["nodes"]
-        self.is_enabled = self.network_config["enabled"]
+        self.is_enabled = self.network_config["enabled"] == 'true'
 
         self.prev_values = [[]] * len(self.nodes)
         self.last_retrieved = [0] * len(self.nodes)

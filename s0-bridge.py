@@ -19,7 +19,6 @@ class S0_Bridge:
         self.ser = Serial(self.cfg)
         self.ntwrk = Network(self.cfg)
 
-
     def start(self):
 
         self.cfg.log('started')
@@ -52,12 +51,12 @@ class S0_Bridge:
         ts_log = self.roundup(ts)
 
         # serial data
-        if self.ser.is_enabled is True:
+        if self.ser.is_enabled:
             new_serial_data = self.ser.get_power_since_last_request()
             db.add_data(ts_log, new_serial_data)
             self.cfg.log('added new data from serial interface')
 
-        if self.ntwrk.is_enabled is True:
+        if self.ntwrk.is_enabled:
             new_network_data = self.ntwrk.get_power_since_last_request()
             db.add_data(ts_log, new_network_data)
             self.cfg.log('added new data from network interfaces')
