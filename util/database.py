@@ -47,8 +47,6 @@ class Database():
     def add_data(self, ts, data_points):
         for data in data_points:
 
-            if data['power'] < 1:  continue    # skip 0 values
-
             data_type = data['source']['type']
 
             if data_type == 'inverter':
@@ -63,33 +61,41 @@ class Database():
 
         inv_serial = data['source']['serial_id']
         prev_ts, prev_etoday, prev_etotal = self.get_previous_yields(inv_serial)
-        status = 'OK'  # TODO: Get actual status value
 
-        self.add_day_data_row(ts, data, prev_ts, prev_etoday, prev_etotal)
+        status = 'OK'  # TODO: Generate actual status value
+
+        self.add_day_data_row(ts, data, prev_etotal)
+
         if self.is_timestamps_from_same_day(prev_ts, ts):
+
             self.update_inverter(inv_serial, ts, status, prev_etoday + data['energy'],  prev_etotal + data['energy'])
+
         else:   # is new day
+
             self.update_inverter(inv_serial, ts, status, data['energy'],  prev_etotal + data['energy'])
             self.add_month_data_row(inv_serial, ts, prev_etoday, prev_etotal)
 
         self.db.commit()
 
-    def add_day_data_row(self, ts, data, prev_ts, prev_etoday, prev_etotal):
-        inv_serial = data['source']['serial_id']
-        query = '''
-           INSERT INTO DayData (
-               TimeStamp,
-               Serial,
-               Power,
-               TotalYield
-           ) VALUES (
-               %s,
-               %s,
-               %s,
-               %s
-           );
-        ''' % (ts, inv_serial, data['power'],  prev_etotal + data['energy'])
-        self.c.execute(query)
+    def add_day_data_row(self, ts, data, prev_etotal):
+
+        if data['power'] > 0:
+
+            inv_serial = data['source']['serial_id']
+            query = '''
+               INSERT INTO DayData (
+                   TimeStamp,
+                   Serial,
+                   Power,
+                   TotalYield
+               ) VALUES (
+                   %s,
+                   %s,
+                   %s,
+                   %s
+               );
+            ''' % (ts, inv_serial, data['power'],  prev_etotal + data['energy'])
+            self.c.execute(query)
 
 
     def get_previous_yields(self, inverter_serial):
@@ -136,29 +142,31 @@ class Database():
 
     def add_consumption_data_row(self, ts, energy_used, power_used):
 
-        query = '''
-            INSERT OR IGNORE INTO Consumption (
-                TimeStamp,
-                EnergyUsed,
-                PowerUsed                                
-            ) VALUES (
-                %s,
-                %s,
-                %s
-            );
-        ''' % (ts, 0, 0)
-        self.c.execute(query)
+        if power_used > 0:
 
-        query = '''
-            UPDATE Consumption SET 
-            EnergyUsed = EnergyUsed + %s,
-            PowerUsed = PowerUsed + %s
-            WHERE TimeStamp = %s;
-        ''' % (energy_used, power_used, ts)
+            query = '''
+                INSERT OR IGNORE INTO Consumption (
+                    TimeStamp,
+                    EnergyUsed,
+                    PowerUsed                                
+                ) VALUES (
+                    %s,
+                    %s,
+                    %s
+                );
+            ''' % (ts, 0, 0)
+            self.c.execute(query)
 
-        self.c.execute(query)
+            query = '''
+                UPDATE Consumption SET 
+                EnergyUsed = EnergyUsed + %s,
+                PowerUsed = PowerUsed + %s
+                WHERE TimeStamp = %s;
+            ''' % (energy_used, power_used, ts)
 
-        self.db.commit()
+            self.c.execute(query)
+
+            self.db.commit()
 
 
     def is_timestamps_from_same_day(self, ts1, ts2):
