@@ -41,7 +41,7 @@ Just flash `arduino/sketch_s0_serial.ino` to the Pro Mini or if you want to use 
 
 ```bash
 sudo apt install python3 python3-pip
-sudo pip3 install pyserial pytz
+sudo pip3 install -r requirements.txt
 ``` 
 
 ### Configure _s0-bridge_
