@@ -23,24 +23,24 @@ class Database():
                         EToday,
                         ETotal
                     ) VALUES (
-                        %s,
-                        %s,
-                        %s
+                        ?,
+                        ?,
+                        ?
                     );
-                ''' % (source["serial_id"], 0, source["prev_etotal"])
-                self.c.execute(query)
+                '''
+                self.c.execute(query, (source["serial_id"], 0, source["prev_etotal"]))
 
                 query = '''
                     UPDATE Inverters
                     SET     
-                        Name='%s', 
-                        Type='%s', 
-                        SW_Version='%s', 
-                        Status='%s',
-                        TimeStamp='%s'
-                    WHERE Serial='%s';
-                ''' % (source["name"], source["inverter_type"], "s0-bridge v0", "OK", int(datetime.now().timestamp()), source["serial_id"] )
-                self.c.execute(query)
+                        Name=?, 
+                        Type=?, 
+                        SW_Version=?, 
+                        Status=?,
+                        TimeStamp=?
+                    WHERE Serial=?;
+                '''
+                self.c.execute(query, (source["name"], source["inverter_type"], "s0-bridge v0", "OK", int(datetime.now().timestamp()), source["serial_id"] ))
 
                 self.db.commit()
 
@@ -89,22 +89,22 @@ class Database():
                    Power,
                    TotalYield
                ) VALUES (
-                   %s,
-                   %s,
-                   %s,
-                   %s
+                   ?,
+                   ?,
+                   ?,
+                   ?
                );
-            ''' % (ts, inv_serial, data['power'],  prev_etotal + data['energy'])
-            self.c.execute(query)
+            '''
+            self.c.execute(query, (ts, inv_serial, data['power'],  prev_etotal + data['energy']))
 
 
     def get_previous_yields(self, inverter_serial):
         query = '''
            SELECT TimeStamp, EToday, ETotal
            FROM Inverters
-           WHERE Serial = '%s'
-        ''' % (inverter_serial)
-        self.c.execute(query)
+           WHERE Serial=?
+        '''
+        self.c.execute(query, (inverter_serial,))
         data = self.c.fetchone()
         return data[0], data[1], data[2]
 
@@ -112,13 +112,13 @@ class Database():
         query = '''
             UPDATE Inverters
             SET     
-                TimeStamp='%s', 
-                Status='%s', 
-                eToday='%s',
-                eTotal='%s'
-            WHERE Serial='%s';
-        ''' % (ts, status, etoday, etotal, inverter_serial)
-        self.c.execute(query)
+                TimeStamp=?, 
+                Status=?, 
+                eToday=?,
+                eTotal=?
+            WHERE Serial=?;
+        '''
+        self.c.execute(query, (ts, status, etoday, etotal, inverter_serial))
 
     def add_month_data_row(self, inverter_serial, ts, etoday, etotal):
 
@@ -132,13 +132,13 @@ class Database():
                 DayYield,
                 TotalYield                                 
             ) VALUES (
-                %s,
-                %s,
-                %s,
-                %s
+                ?,
+                ?,
+                ?,
+                ?
             );
-        ''' % (y_ts, inverter_serial, etoday, etotal)
-        self.c.execute(query)
+        '''
+        self.c.execute(query, (y_ts, inverter_serial, etoday, etotal))
 
     def add_consumption_data_row(self, ts, energy_used, power_used):
 
@@ -150,21 +150,21 @@ class Database():
                     EnergyUsed,
                     PowerUsed                                
                 ) VALUES (
-                    %s,
-                    %s,
-                    %s
+                    ?,
+                    ?,
+                    ?
                 );
-            ''' % (ts, 0, 0)
-            self.c.execute(query)
+            '''
+            self.c.execute(query, (ts, 0, 0))
 
             query = '''
                 UPDATE Consumption SET 
-                EnergyUsed = EnergyUsed + %s,
-                PowerUsed = PowerUsed + %s
-                WHERE TimeStamp = %s;
-            ''' % (energy_used, power_used, ts)
+                EnergyUsed = EnergyUsed + ?,
+                PowerUsed = PowerUsed + ?
+                WHERE TimeStamp=?;
+            '''
 
-            self.c.execute(query)
+            self.c.execute(query, (energy_used, power_used, ts))
 
             self.db.commit()
 
