@@ -15,7 +15,7 @@ class Database():
     def add_inverters(self):
         interfaces = self.config.get_connection_interfaces()
         for source in interfaces:
-            if source["type"] == "inverter":
+            if source["type"] == "inverter" and len(source["serial_id"]) > 0:
 
                 query = '''
                     INSERT OR IGNORE INTO Inverters (
