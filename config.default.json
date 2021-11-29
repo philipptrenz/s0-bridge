@@ -1,42 +1,42 @@
 {
-	"database": {
-		"path": "/home/pi/smadata/SBFspot.db"
-	},
-	"data_interfaces": {
-		"serial": {
-            "enabled": "true",
-			"path": "/dev/serial0",
-			"baudrate": 115200,
-			"timeout": 1,
-			"interfaces": [
-				{
-				    "type": "inverter",
-                    "serial_id": "1000000001",
-					"name": "My Power Plant",
-					"inverter_type": "XYZ",
-					"prev_etotal": 0,
-					"pulses_per_kwh": 1000
-				}
-			]
-		},
-		"network": {
-            "enabled": "true",
-            "nodes": [
-              {
-                "node_name": "ESP8266 NodeMCU",
-                "ip_address": "192.168.0.10",
-                "timeout": 1,
-                "interfaces": [
+   "database":{
+      "path":"/home/pi/smadata/SBFspot.db"
+   },
+   "data_interfaces":{
+      "serial":{
+         "enabled":"true",
+         "path":"/dev/serial0",
+         "baudrate":115200,
+         "timeout":1,
+         "interfaces":[
+            {
+               "type":"inverter",
+               "serial_id":"1000000001",
+               "name":"My Power Plant",
+               "inverter_type":"XYZ",
+               "prev_etotal":0,
+               "pulses_per_kwh":1000
+            }
+         ]
+      },
+      "network":{
+         "enabled":"true",
+         "nodes":[
+            {
+               "node_name":"ESP8266 NodeMCU",
+               "ip_address":"192.168.0.10",
+               "timeout":1,
+               "interfaces":[
                   {
-                    "serial_id": "9000000001",
-                    "name": "My Consumption Power Meter",
-                    "type": "consumption",
-                    "prev_etotal": 0,
-                    "pulses_per_kwh": 1000
+                     "serial_id":"9000000001",
+                     "name":"My Consumption Power Meter",
+                     "type":"consumption",
+                     "prev_etotal":0,
+                     "pulses_per_kwh":1000
                   }
-                ]
-              }
-            ]
-        }
-	}
+               ]
+            }
+         ]
+      }
+   }
 }
