@@ -102,7 +102,7 @@ class Network:
         return res
 
 
-    def process_consumption(self, db):
+    def process_consumption(self, db, cfg):
 
         now = time.time()
 
@@ -177,8 +177,12 @@ class Network:
                 self_consumption_plant_production = db.get_production_in_range(start=prev_ts, end=now, inverters=offset_inverters)
                 pv_self_consumption = self_consumption_plant_production - diff_production
 
+        
+
         energy_used = grid_consumption + pv_self_consumption
         power_used = energy_used / (now - prev_ts) * 3600
+
+        cfg.log("reporting consumption: " + energy_used + " Wh (grid: " + grid_consumption + " Wh, pv: " + pv_self_consumption + " Wh)")
 
         db.add_consumption_data_row(now, energy_used, power_used)
 

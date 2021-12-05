@@ -27,6 +27,8 @@ class S0_Bridge:
         self.cfg.log('adding inverters')
         self.db.add_inverters()
 
+        self.ntwrk.process_consumption(db=self.db, cfg=self.cfg)
+
         self.cfg.log('starting timed data collection (every 5 minutes)')
         try:
             while True:
@@ -63,7 +65,7 @@ class S0_Bridge:
                 db.add_data(ts_log, new_network_data)
                 self.cfg.log('added pv data from network interfaces')
 
-            added = self.ntwrk.process_consumption(db=db)
+            added = self.ntwrk.process_consumption(db=db, cfg=self.cfg)
             if added:
                 self.cfg.log('added consumption data from network interfaces')
 
