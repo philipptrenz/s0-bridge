@@ -4,8 +4,6 @@
 from urllib import request
 import json, time
 
-from database import Database
-
 class Network:
 
     def __init__(self, config):
@@ -104,7 +102,7 @@ class Network:
         return res
 
 
-    def process_consumption(self, db: Database):
+    def process_consumption(self, db):
 
         now = time.time()
 
