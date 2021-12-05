@@ -142,6 +142,8 @@ class Database():
 
     def add_consumption_data_row(self, ts, energy_used, power_used):
 
+        if power_used <= 0: return
+
         query = '''
             INSERT OR IGNORE INTO Consumption (
                 TimeStamp,
