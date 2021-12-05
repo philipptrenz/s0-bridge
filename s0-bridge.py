@@ -32,7 +32,7 @@ class S0_Bridge:
             while True:
                 ts = datetime.now().timestamp()
                 # before minute of time is a multiple of 5 minutes
-                if (int(ts) % 5) == 4:
+                if (int(ts) % 300) == 299:
                     self.cfg.log('collecting new data')
                     self.collect_data(self.db, ts)
                 t.sleep(1)
