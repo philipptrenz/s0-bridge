@@ -188,7 +188,7 @@ class Network:
             "production": new_production
         }
 
-        return True, new_comsumption
+        return True
 
 
     def close(self):
