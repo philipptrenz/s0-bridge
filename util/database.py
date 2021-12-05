@@ -155,8 +155,9 @@ class Database():
                     ?
                 );
             '''
-            self.c.execute(query, (ts, 0, 0))
+            self.c.execute(query, (int(ts), 0, 0))
 
+            
             query = '''
                 UPDATE Consumption SET 
                 EnergyUsed = EnergyUsed + ?,
@@ -164,9 +165,10 @@ class Database():
                 WHERE TimeStamp=?;
             '''
 
-            self.c.execute(query, (energy_used, power_used, ts))
+            self.c.execute(query, (int(energy_used), int(power_used), int(ts)))
 
             self.db.commit()
+            
 
 
     def is_timestamps_from_same_day(self, ts1, ts2):

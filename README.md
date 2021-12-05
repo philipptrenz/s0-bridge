@@ -112,10 +112,6 @@ The Arduino Sketch supports up to three S0 inputs (on pins 2, 3 and 4), but can 
 
 **NOTE**: The circuit provides a voltage of 5VDC to the S0 interface of a connected power meter. This may not be sufficient for every S0 interface. The circuit diagram can certainly be adjusted accordingly the specs of any S0-enabled power meter, but I will not provide any support therefore. However, it works well with the _Eltako DSZ15D_ for example.
 
-### NodeMCU (ESP8266)
-
-(coming soon)
-
 ## Disclaimer 
 
 **Dealing with mains voltage is life-threatening!** 
