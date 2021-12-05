@@ -192,8 +192,7 @@ class Network:
 
 
     def close(self):
-        if "conn" in self:
-            self.conn.close()
+        pass
 
 
 if __name__ == '__main__':
