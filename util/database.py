@@ -142,33 +142,31 @@ class Database():
 
     def add_consumption_data_row(self, ts, energy_used, power_used):
 
-        if power_used > 0:
+        query = '''
+            INSERT OR IGNORE INTO Consumption (
+                TimeStamp,
+                EnergyUsed,
+                PowerUsed                                
+            ) VALUES (
+                ?,
+                ?,
+                ?
+            );
+        '''
+        self.c.execute(query, (int(ts), 0, 0))
 
-            query = '''
-                INSERT OR IGNORE INTO Consumption (
-                    TimeStamp,
-                    EnergyUsed,
-                    PowerUsed                                
-                ) VALUES (
-                    ?,
-                    ?,
-                    ?
-                );
-            '''
-            self.c.execute(query, (int(ts), 0, 0))
+        
+        query = '''
+            UPDATE Consumption SET 
+            EnergyUsed = EnergyUsed + ?,
+            PowerUsed = PowerUsed + ?
+            WHERE TimeStamp=?;
+        '''
 
-            
-            query = '''
-                UPDATE Consumption SET 
-                EnergyUsed = EnergyUsed + ?,
-                PowerUsed = PowerUsed + ?
-                WHERE TimeStamp=?;
-            '''
+        self.c.execute(query, (int(energy_used), int(power_used), int(ts)))
 
-            self.c.execute(query, (int(energy_used), int(power_used), int(ts)))
-
-            self.db.commit()
-            
+        self.db.commit()
+        
 
 
     def is_timestamps_from_same_day(self, ts1, ts2):
