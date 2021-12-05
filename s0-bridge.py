@@ -53,15 +53,19 @@ class S0_Bridge:
         # serial data
         if self.ser.is_enabled:
             new_serial_data = self.ser.get_power_since_last_request()
-            db.add_data(ts_log, new_serial_data)
-            self.cfg.log('added new data from serial interface')
+            if len(new_serial_data) > 0:
+                db.add_data(ts_log, new_serial_data)
+                self.cfg.log('added pv data from serial interface')
 
         if self.ntwrk.is_enabled:
             new_network_data = self.ntwrk.get_power_since_last_request()
-            db.add_data(ts_log, new_network_data)
+            if len(new_network_data) > 0:
+                db.add_data(ts_log, new_network_data)
+                self.cfg.log('added pv data from network interfaces')
 
-            self.ntwrk.process_consumption(db=db)
-            self.cfg.log('added new data from network interfaces')
+            added, _ = self.ntwrk.process_consumption(db=db)
+            if added:
+                self.cfg.log('added consumption data from network interfaces')
 
         # print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
 

@@ -165,7 +165,7 @@ class Network:
                 "consumption": new_comsumption,
                 "production": new_production
             }
-            return
+            return False
 
         prev_ts = self.prev_consumption["ts"]
         grid_consumption = new_comsumption - self.prev_consumption["consumption"]
@@ -187,6 +187,8 @@ class Network:
             "consumption": new_comsumption,
             "production": new_production
         }
+
+        return True, new_comsumption
 
 
     def close(self):
