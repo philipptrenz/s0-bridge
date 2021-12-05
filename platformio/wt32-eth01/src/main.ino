@@ -38,6 +38,9 @@ bool hasFechted = false;
 bool isFetchReading = false;
 bool isFetchRead = false;
 
+float consumptionPower = -1;
+float productionPower = -1;
+
 
 void initializeOTA() {
   // Port defaults to 3232
@@ -87,6 +90,15 @@ void handlePowerMeterReading() {
 
       // end of message is "!" resp. 0x21, fail after 8 seconds
       if ((fetchedData.charAt(fetchedData.length()-1) != 0x3F && in==0x21) || (millis()-lastFetched) > 8000) {
+
+        // Parse data for purchased power
+        float purchase = getCounterReading("1.8.0", fetchedData);
+        if (purchase > 0) consumptionPower = purchase;
+
+        // Parse data for power fed to the grid
+        float feed = getCounterReading("2.8.0", fetchedData);
+        if (feed > 0) productionPower = feed;
+
         isFetchRead = true;
         hasFechted = false;
         isFetchReading = false;
@@ -109,6 +121,16 @@ float getCounterReading(String counterId, String data) {
 }  
 
 void handleRoot() {
+
+  // Send as array on POST request
+  if (server.method() == HTTP_POST) {
+    if (consumptionPower > 0 && productionPower > 0) 
+      server.send(200, "application/json", "[" + String(consumptionPower) + "," + String(productionPower) + "]");
+    else
+      server.send(202, "application/json", "[]");
+    return;
+  }
+
   String message ="<html>";
 
   message += "<head>";
@@ -124,23 +146,13 @@ void handleRoot() {
 
   if (data.length() > 0) {
 
-    float purchase = getCounterReading("1.8.0", data);
-    if (purchase > 0)
-      message += "<p><b>Bezug:</b> " + String(purchase) + " kWh</p>";
-
-
-    float feed = getCounterReading("2.8.0", data);
-    if (feed > 0)
-      message += "<p><b>Einspeisung:</b> " + String(feed) + " kWh</p>";
-
+    if (consumptionPower > 0) message += "<p><b>Bezug:</b> " + String(consumptionPower) + " kWh</p>";
+    if (productionPower > 0) message += "<p><b>Einspeisung:</b> " + String(productionPower) + " kWh</p>";
 
     data.replace("\n", "<br>");    
     message += "<details><summary><b>Datagramm</b></summary><p style=\"padding-left: 16px;\">" + data + "</p></details>";
 
-  } else {
-    message += "<p><b>Noch keine Daten empfangen</b></p>";
-  }
-
+  } else message += "<p><b>Noch keine Daten empfangen</b></p>";
 
   message += "<p>Vor " + String((millis() - lastFetched) / 1000) + " Sekunden aktualisiert</p>";
   
