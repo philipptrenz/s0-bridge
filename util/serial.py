@@ -13,6 +13,7 @@ class Serial:
 
         self.prev_values = [0] * len( self.interfaces )
         self.last_retrieved = 0
+        self.conn = None
 
         self.unsigned_long_max_size = 2**32-1
 
@@ -80,8 +81,7 @@ class Serial:
 
 
     def close(self):
-        if self.conn:
-            self.conn.close()
+        if self.conn: self.conn.close()
 
 if __name__ == '__main__':
 

@@ -32,7 +32,7 @@ class S0_Bridge:
             while True:
                 ts = datetime.now().timestamp()
                 # before minute of time is a multiple of 5 minutes
-                if (int(ts) % 300) == 299:
+                if (int(ts) % 5) == 4:
                     self.cfg.log('collecting new data')
                     self.collect_data(self.db, ts)
                 t.sleep(1)
@@ -63,7 +63,7 @@ class S0_Bridge:
                 db.add_data(ts_log, new_network_data)
                 self.cfg.log('added pv data from network interfaces')
 
-            added, _ = self.ntwrk.process_consumption(db=db)
+            added = self.ntwrk.process_consumption(db=db)
             if added:
                 self.cfg.log('added consumption data from network interfaces')
 

@@ -59,7 +59,7 @@ class Network:
             new_values = []
 
             try:
-                new_values = self.read_network(url, timeout)[0:len(interfaces)]
+                new_values = self.read_network(url, timeout, method=node["method"])[0:len(interfaces)]
             except Exception as e:
                 if not initial_request: self.cfg.log('network: request failed', e)
                 new_values = [0] * len( interfaces )
