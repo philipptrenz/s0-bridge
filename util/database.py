@@ -174,6 +174,31 @@ class Database():
         d2 = datetime.fromtimestamp(ts2)
         return (d1.year == d2.year and d1.month == d2.month and d1.day == d2.day)
 
+
+    def get_production_in_range(self, start, end, inverters):
+        # Returns production in watts
+
+        query = '''
+           SELECT MAX(TotalYield)-MIN(TotalYield) 
+           FROM DayData WHERE Serial IN ({seq})  
+           AND TimeStamp BETWEEN ? AND ? GROUP BY Serial;
+        '''.format(seq=','.join(['?']*len(inverters)))
+
+        args = inverters.copy()
+        args.append(int(start))
+        args.append(int(end))
+
+        self.c.execute(query, args)
+        data = self.c.fetchall()
+
+        if(len(data) > 0):
+            sum = 0
+            for d in data:
+                if type(d) == int: sum += d
+                else: sum += d[0]
+            return sum        
+        return 0
+
     def close(self):
         self.db.close()
 

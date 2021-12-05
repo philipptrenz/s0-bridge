@@ -59,6 +59,8 @@ class S0_Bridge:
         if self.ntwrk.is_enabled:
             new_network_data = self.ntwrk.get_power_since_last_request()
             db.add_data(ts_log, new_network_data)
+
+            self.ntwrk.process_consumption(db=db)
             self.cfg.log('added new data from network interfaces')
 
         # print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
