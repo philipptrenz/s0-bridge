@@ -186,11 +186,12 @@ class Network:
 
         db.add_consumption_data_row(now, energy_used, power_used)
 
-        self.prev_consumption = {
-            "ts": now,
-            "consumption": new_comsumption,
-            "production": new_production
-        }
+        if new_comsumption > 0:
+            self.prev_consumption = {
+                "ts": now,
+                "consumption": new_comsumption,
+                "production": new_production
+            }
 
         return True
 
