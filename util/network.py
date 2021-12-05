@@ -182,7 +182,7 @@ class Network:
         energy_used = grid_consumption + pv_self_consumption
         power_used = energy_used / (now - prev_ts) * 3600
 
-        cfg.log("reporting consumption: " + energy_used + " Wh (grid: " + grid_consumption + " Wh, pv: " + pv_self_consumption + " Wh)")
+        cfg.log("reporting consumption: " + str(energy_used) + " Wh (grid: " + str(grid_consumption) + " Wh, pv: " + str(pv_self_consumption) + " Wh)")
 
         db.add_consumption_data_row(now, energy_used, power_used)
 
