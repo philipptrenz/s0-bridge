@@ -182,8 +182,6 @@ class Network:
         energy_used = grid_consumption + pv_self_consumption
         power_used = energy_used / (now - prev_ts) * 3600
 
-        print("consumption:\n\tenergy:", energy_used, "\n\tpower:", power_used)
-
         db.add_consumption_data_row(now, energy_used, power_used)
 
         self.prev_consumption = {
