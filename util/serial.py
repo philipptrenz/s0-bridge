@@ -80,7 +80,8 @@ class Serial:
 
 
     def close(self):
-        self.conn.close()
+        if "conn" in self:
+            self.conn.close()
 
 if __name__ == '__main__':
 
