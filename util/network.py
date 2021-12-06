@@ -3,6 +3,7 @@
 """
 from urllib import request
 import json, time
+from datetime import datetime
 
 class Network:
 
@@ -17,14 +18,16 @@ class Network:
 
         self.unsigned_long_max_size = 2 ** 32 - 1
 
+        if self.is_enabled:
+            self.get_power_since_last_request(True)
+
         self.prev_consumption = {
             "ts": -1,
             "consumption": None,
-            "production": None
+            "ts_prod": -1,
+            "production": None,
+            "error_prod": 0
         }
-
-        if self.is_enabled:
-            self.get_power_since_last_request(True)
 
 
     def read_network(self, url, timeout, method="GET"):
@@ -102,13 +105,13 @@ class Network:
         return res
 
 
-    def process_consumption(self, db, cfg):
+    def process_consumption(self, db, cfg, dry_run=False):
 
         now = time.time()
 
         initial_request = self.prev_consumption["ts"] <= 0
 
-        new_comsumption = None
+        new_cosumption = None
         new_production = None
 
         offset_inverters = []
@@ -141,9 +144,9 @@ class Network:
                             self.cfg.log('only absolute readings supported for consumption')
                             continue
                         if source["unit"] == "Wh":
-                            new_comsumption = val
+                            new_consumption = val
                         elif source["unit"] == "kWh":
-                            new_comsumption = val * 1000
+                            new_consumption = val * 1000
 
                     if source["type"] == "production":
                         if source["reading"] != "absolute":
@@ -158,40 +161,56 @@ class Network:
 
             except Exception as e:
                 if not initial_request: self.cfg.log('network: request failed', e)
-        
+
         if initial_request:
             self.prev_consumption = {
                 "ts": now,
-                "consumption": new_comsumption,
-                "production": new_production
+                "consumption": new_consumption,
+                "ts_prod": now,
+                "production": new_production,
+                "error_prod": 0
             }
             return False
 
         prev_ts = self.prev_consumption["ts"]
-        grid_consumption = new_comsumption - self.prev_consumption["consumption"]
-        pv_self_consumption = 0
+        if now - prev_ts < 300: prev_ts = now - 300
 
-        if new_production:
-            diff_production = new_production - self.prev_consumption["production"]
-            if len(offset_inverters) > 0:
-                self_consumption_plant_production = db.get_production_in_range(start=prev_ts, end=now, inverters=offset_inverters)
-                pv_self_consumption = self_consumption_plant_production - diff_production
+        prev_ts_prod = self.prev_consumption["ts_prod"] if "ts_prod" in self.prev_consumption and self.prev_consumption["ts_prod"] > 0 else prev_ts
+        if now - prev_ts_prod < 300: prev_ts_prod = now - 300
 
-        
+        diff_grid_consumption = max(0, new_consumption - self.prev_consumption["consumption"])
+        diff_grid_production = max(0, new_production - self.prev_consumption["production"])
 
-        energy_used = grid_consumption + pv_self_consumption
+        plant_production = 0.0
+        if len(offset_inverters) > 0:
+            plant_production = db.get_production_in_range(start=prev_ts_prod-300, end=now-150, inverters=offset_inverters)
+
+        pv_self_consumption = plant_production - diff_grid_production
+        energy_used = diff_grid_consumption + pv_self_consumption + self.prev_consumption["error_prod"]
+
+        if energy_used < 0:
+            self.prev_consumption["error_prod"] = energy_used
+            energy_used = 0
+        else:
+            self.prev_consumption["error_prod"] = 0
+
         power_used = energy_used / (now - prev_ts) * 3600
 
-        cfg.log("reporting consumption: " + str(energy_used) + " Wh (grid: " + str(grid_consumption) + " Wh, pv: " + str(pv_self_consumption) + " Wh)")
+        # Reset error if between 1 and 2 AM
+        if datetime.fromtimestamp(now).hour in range(1,2):
+            self.prev_consumption["error_prod"] = 0
 
-        db.add_consumption_data_row(now, energy_used, power_used)
+        cfg.log("grid consumption: " + str(diff_grid_consumption) + " Wh, grid feed: " + str(diff_grid_production) + " Wh, plant production: " + str(plant_production) + " Wh, total consumption: " + str(energy_used) + " Wh, error: " + str(self.prev_consumption["error_prod"]) + " Wh")
 
-        if new_comsumption > 0:
-            self.prev_consumption = {
-                "ts": now,
-                "consumption": new_comsumption,
-                "production": new_production
-            }
+        if not dry_run:
+            db.add_consumption_data_row(now, energy_used, power_used)
+
+        if new_consumption > 0 or new_production > 0:
+            self.prev_consumption["ts"] = now
+            self.prev_consumption["consumption"] = new_consumption
+        if new_production > 0:
+            self.prev_consumption["ts_prod"] = now
+            self.prev_consumption["production"] = new_production
 
         return True
 
@@ -210,22 +229,11 @@ if __name__ == '__main__':
     ntwrk = Network(cfg)
     db = Database(cfg)
 
-    ntwrk.process_consumption(db)
+    ntwrk.process_consumption(db, cfg, dry_run=True)
 
-    ntwrk.process_consumption(db)
+    ntwrk.prev_consumption["consumption"] -= 100
+    ntwrk.process_consumption(db, cfg, dry_run=True)
 
-    ntwrk.process_consumption(db)
-
-
-    exit()
-
-    while True:
-        data = ntwrk.get_power_since_last_request()
-
-        s = '['
-        for i, d in enumerate(data):
-            s += str(d["energy"])
-            if i < len(data)-1: s += ','
-        s += ']'
-        print(data)
-        time.sleep(3)
+    ntwrk.prev_consumption["consumption"] -= 100
+    ntwrk.prev_consumption["production"] -= 100
+    ntwrk.process_consumption(db, cfg, dry_run=True)

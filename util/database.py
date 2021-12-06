@@ -32,10 +32,10 @@ class Database():
 
                 query = '''
                     UPDATE Inverters
-                    SET     
-                        Name=?, 
-                        Type=?, 
-                        SW_Version=?, 
+                    SET
+                        Name=?,
+                        Type=?,
+                        SW_Version=?,
                         Status=?,
                         TimeStamp=?
                     WHERE Serial=?;
@@ -111,9 +111,9 @@ class Database():
     def update_inverter(self, inverter_serial, ts, status, etoday, etotal):
         query = '''
             UPDATE Inverters
-            SET     
-                TimeStamp=?, 
-                Status=?, 
+            SET
+                TimeStamp=?,
+                Status=?,
                 eToday=?,
                 eTotal=?
             WHERE Serial=?;
@@ -130,7 +130,7 @@ class Database():
                 TimeStamp,
                 Serial,
                 DayYield,
-                TotalYield                                 
+                TotalYield
             ) VALUES (
                 ?,
                 ?,
@@ -148,7 +148,7 @@ class Database():
             INSERT OR IGNORE INTO Consumption (
                 TimeStamp,
                 EnergyUsed,
-                PowerUsed                                
+                PowerUsed
             ) VALUES (
                 ?,
                 ?,
@@ -157,9 +157,9 @@ class Database():
         '''
         self.c.execute(query, (int(ts), 0, 0))
 
-        
+
         query = '''
-            UPDATE Consumption SET 
+            UPDATE Consumption SET
             EnergyUsed = EnergyUsed + ?,
             PowerUsed = PowerUsed + ?
             WHERE TimeStamp=?;
@@ -168,7 +168,7 @@ class Database():
         self.c.execute(query, (int(energy_used), int(power_used), int(ts)))
 
         self.db.commit()
-        
+
 
 
     def is_timestamps_from_same_day(self, ts1, ts2):
@@ -181,8 +181,8 @@ class Database():
         # Returns production in watts
 
         query = '''
-           SELECT MAX(TotalYield)-MIN(TotalYield) 
-           FROM DayData WHERE Serial IN ({seq})  
+           SELECT MAX(TotalYield)-MIN(TotalYield)
+           FROM DayData WHERE Serial IN ({seq})
            AND TimeStamp BETWEEN ? AND ? GROUP BY Serial;
         '''.format(seq=','.join(['?']*len(inverters)))
 
@@ -193,12 +193,14 @@ class Database():
         self.c.execute(query, args)
         data = self.c.fetchall()
 
+        #print(query, args, data)
+
         if(len(data) > 0):
-            sum = 0
+            sum = 0.0
             for d in data:
                 if type(d) == int: sum += d
                 else: sum += d[0]
-            return sum        
+            return sum
         return 0
 
     def close(self):
@@ -254,8 +256,3 @@ if __name__ == '__main__':
         print(test_date.strftime("%y-%m-%d %H:%M:%S"), '\t', test_ts, '\t', test_data[0]['energy'], '\t', test_data[0]['power'])
 
         time.sleep(0.1)
-
-
-
-
-
