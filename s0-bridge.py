@@ -62,10 +62,8 @@ class S0_Bridge:
         try:
             for _ in range(cycles):
                 ts = datetime.now().timestamp()
-                # before minute of time is a multiple of 5 minutes
-                if (int(ts) % 300) == 299:
-                    self.cfg.log('collecting new data')
-                    self.collect_data(self.db, ts, dry=True)
+                self.cfg.log('collecting new data')
+                self.collect_data(self.db, ts, dry=True)
                 t.sleep(5)
         except KeyboardInterrupt:
             print('Shutting down')
