@@ -42,8 +42,9 @@ class Config():
         interfaces = list()
         if "interfaces" in self.config["data_interfaces"]["serial"]:
             interfaces.extend(self.config["data_interfaces"]["serial"]["interfaces"])
-        if "interfaces" in self.config["data_interfaces"]["network"]:
-            interfaces.extend(self.config["data_interfaces"]["network"]["interfaces"])
+        for node in self.config["data_interfaces"]["network"]["nodes"]:
+            if "interfaces" in node:
+                interfaces.extend(node["interfaces"])
         return interfaces
 
     def log(self, msg, error=''):
