@@ -91,7 +91,7 @@ class S0_Bridge:
                     db.add_data(ts_log, new_network_data)
                     self.cfg.log('added pv data from network interfaces')
 
-            grid_in, grid_out = self.ntwrk.get_absolute_grid_meter_data()
+            grid_in, grid_out = self.ntwrk.get_absolute_grid_meter_data(cfg=self.cfg)
             if not dry:
                 self.db.add_grid_meter_data_row(ts_log, grid_in, grid_out)
                 self.cfg.log('added grid meter data from network interfaces')

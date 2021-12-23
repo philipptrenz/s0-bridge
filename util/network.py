@@ -103,7 +103,7 @@ class Network:
         return res
 
 
-    def get_absolute_grid_meter_data(self, cfg, dry_run=False):
+    def get_absolute_grid_meter_data(self, cfg):
 
         now = time.time()
 
@@ -182,12 +182,3 @@ if __name__ == '__main__':
     cfg = Config(config_path='config.json')
     ntwrk = Network(cfg)
     db = Database(cfg)
-
-    ntwrk.process_consumption(db, cfg, dry_run=True)
-
-    ntwrk.prev_consumption["consumption"] -= 100
-    ntwrk.process_consumption(db, cfg, dry_run=True)
-
-    ntwrk.prev_consumption["consumption"] -= 100
-    ntwrk.prev_consumption["production"] -= 100
-    ntwrk.process_consumption(db, cfg, dry_run=True)
