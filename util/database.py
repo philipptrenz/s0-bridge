@@ -157,9 +157,7 @@ class Database():
         self.c.execute(query, (y_ts, inverter_serial, etoday, etotal))
 
 
-
     def add_grid_meter_data_row(self, ts, absolute_in, absolute_out):
-
         query = '''
             INSERT INTO GridMeter (
                 TimeStamp,
@@ -171,7 +169,7 @@ class Database():
                 ?
             );
         '''
-        self.c.execute(query, (int(ts), int(absolute_in), int(absolute_out)))
+        self.c.execute(query, (int(ts), absolute_in, absolute_out))
 
         self.db.commit()
 
@@ -203,7 +201,6 @@ class Database():
         '''
 
         self.c.execute(query, (int(energy_used), int(power_used), int(ts)))
-
         self.db.commit()
 
 
