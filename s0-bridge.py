@@ -94,11 +94,9 @@ class S0_Bridge:
                     self.cfg.log('added pv data from network interfaces')
 
             grid_in, grid_out = self.ntwrk.get_absolute_grid_meter_data(cfg=self.cfg)
-            if not dry:
-                self.db.add_grid_meter_data_row(ts_log, grid_in, grid_out)
-                self.cfg.log('added grid meter data from network interfaces')
-            else:
-                self.cfg.log('grid meter data: in = {} Wh, out = {} Wh'.format(grid_in, grid_out))
+            if dry: self.cfg.log('grid meter data: in = {} Wh, out = {} Wh'.format(grid_in, grid_out))
+            self.db.add_grid_meter_data_row(ts_log, grid_in, grid_out)
+            self.cfg.log('added grid meter data from network interfaces')
 
 
     def roundup(self, x):
