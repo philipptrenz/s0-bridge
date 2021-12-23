@@ -17,6 +17,7 @@ class Network:
         self.last_retrieved = [0] * len(self.nodes)
 
         self.unsigned_long_max_size = 2 ** 32 - 1
+        self.unsigned_long_overflow_sanity = self.unsigned_long_max_size - 10000
 
         if self.is_enabled:
             self.get_power_since_last_request(True)
@@ -77,7 +78,10 @@ class Network:
                     diff[idx] = new_values[idx] - self.prev_values[node_idx][idx]
                     # arduino unsigned long overflow
                     if new_values[idx] < self.prev_values[node_idx][idx]: 
-                        diff[idx] = self.unsigned_long_max_size - self.prev_values[node_idx][idx] + new_values[idx]
+                        if self.prev_values[node_idx][idx] > self.unsigned_long_overflow_sanity:
+                            diff[idx] = self.unsigned_long_max_size - self.prev_values[node_idx][idx] + new_values[idx]
+                        else:
+                            print('Network node ' + node_name + 'seems to have rebooted')
 
             self.prev_values[node_idx] = new_values
 
