@@ -98,8 +98,7 @@ class S0_Bridge:
                 self.db.add_grid_meter_data_row(ts_log, grid_in, grid_out)
                 self.cfg.log('added grid meter data from network interfaces')
             else:
-                log_str = 'grid meter data: in = {} Wh, out = {} Wh'.format(grid_in, grid_out)
-                self.cfg.log(log_str)
+                self.cfg.log('grid meter data: in = {} Wh, out = {} Wh'.format(grid_in, grid_out))
 
 
     def roundup(self, x):

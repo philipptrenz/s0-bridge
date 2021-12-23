@@ -75,7 +75,8 @@ class Network:
             if not self.last_retrieved[node_idx] == 0:
                 for idx in range(len(interfaces)):
                     diff[idx] = new_values[idx] - self.prev_values[node_idx][idx]
-                    if new_values[idx] < self.prev_values[node_idx][idx]:  # arduino unsigned long overflow
+                    # arduino unsigned long overflow
+                    if new_values[idx] < self.prev_values[node_idx][idx]: 
                         diff[idx] = self.unsigned_long_max_size - self.prev_values[node_idx][idx] + new_values[idx]
 
             self.prev_values[node_idx] = new_values

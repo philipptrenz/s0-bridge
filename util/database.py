@@ -19,8 +19,8 @@ class Database():
         query = '''
             CREATE TABLE IF NOT EXISTS GridMeter (
                 TimeStamp datetime NOT NULL,
-                GridIn int(8),
-                GridOut int(8),
+                GridIn int(4),
+                GridOut int(4),
                 PRIMARY KEY (TimeStamp)
             );
         '''
@@ -162,14 +162,13 @@ class Database():
             INSERT INTO GridMeter (
                 TimeStamp,
                 GridIn,
-                GridOut,
+                GridOut
             ) VALUES (
                 ?,
                 ?,
                 ?
             );
         '''
-
 
         data = ( int(ts), absolute_in, absolute_out )
         self.c.execute(query, data)
