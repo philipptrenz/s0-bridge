@@ -159,7 +159,7 @@ class Database():
 
     def add_grid_meter_data_row(self, ts, absolute_in, absolute_out):
         query = '''
-            INSERT INTO GridMeter (
+            INSERT OR IGNORE INTO GridMeter (
                 TimeStamp,
                 GridIn,
                 GridOut
@@ -172,6 +172,17 @@ class Database():
 
         data = ( int(ts), absolute_in, absolute_out )
         self.c.execute(query, data)
+
+        query = '''
+            UPDATE GridMeter SET
+            GridIn = GridIn + ?,
+            GridOut = GridOut + ?
+            WHERE TimeStamp=?;
+        '''
+
+        data = ( absolute_in, absolute_out, int(ts) )
+        self.c.execute(query, data)
+
         self.db.commit()
 
 
