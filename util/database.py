@@ -175,8 +175,8 @@ class Database():
 
         query = '''
             UPDATE GridMeter SET
-            GridIn = GridIn + ?,
-            GridOut = GridOut + ?
+            GridIn = ?,
+            GridOut = ?
             WHERE TimeStamp=?;
         '''
 
