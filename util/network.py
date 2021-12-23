@@ -140,18 +140,18 @@ class Network:
                             self.cfg.log('only absolute readings supported for consumption')
                             continue
                         if source["unit"] == "Wh":
-                            new_consumption = val
+                            new_consumption = int(val)
                         elif source["unit"] == "kWh":
-                            new_consumption = val * 1000
+                            new_consumption = int(val * 1000)
 
                     if source["type"] == "production":
                         if source["reading"] != "absolute":
                             self.cfg.log('only absolute readings supported for production')
                             continue
                         if source["unit"] == "Wh":
-                            new_production = val
+                            new_production = int(val)
                         elif source["unit"] == "kWh":
-                            new_production = val * 1000
+                            new_production = int(val * 1000)
 
                         offset_inverters = source["offset_inverters_with_serial_id"]
 
