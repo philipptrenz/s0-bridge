@@ -169,8 +169,10 @@ class Database():
                 ?
             );
         '''
-        self.c.execute(query, (int(ts), absolute_in, absolute_out))
 
+
+        data = ( int(ts), absolute_in, absolute_out )
+        self.c.execute(query, data)
         self.db.commit()
 
 
