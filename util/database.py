@@ -12,6 +12,22 @@ class Database():
         self.db = sqlite3.connect(self.config.get_database_path(), check_same_thread=False)
         self.c = self.db.cursor()
 
+        self.create_additional_tables()
+
+
+    def create_additional_tables():
+        query = '''
+            CREATE TABLE IF NOT EXISTS GridMeter (
+                TimeStamp datetime NOT NULL,
+                GridIn int(8),
+                GridOut int(8),
+                PRIMARY KEY (TimeStamp)
+            );
+        '''
+        self.c.execute(query)
+        self.db.commit()
+
+
     def add_inverters(self):
         interfaces = self.config.get_connection_interfaces()
         for source in interfaces:
@@ -139,6 +155,27 @@ class Database():
             );
         '''
         self.c.execute(query, (y_ts, inverter_serial, etoday, etotal))
+
+
+
+    def add_grid_meter_data_row(self, ts, absolute_in, absolute_out):
+
+        query = '''
+            INSERT INTO GridMeter (
+                TimeStamp,
+                GridIn,
+                GridOut,
+            ) VALUES (
+                ?,
+                ?,
+                ?
+            );
+        '''
+        self.c.execute(query, (int(ts), int(absolute_in), int(absolute_out)))
+
+        self.db.commit()
+
+
 
     def add_consumption_data_row(self, ts, energy_used, power_used):
 

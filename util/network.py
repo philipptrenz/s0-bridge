@@ -24,9 +24,7 @@ class Network:
         self.prev_consumption = {
             "ts": -1,
             "consumption": None,
-            "ts_prod": -1,
             "production": None,
-            "error_prod": 0
         }
 
 
@@ -105,7 +103,7 @@ class Network:
         return res
 
 
-    def process_consumption(self, db, cfg, dry_run=False):
+    def get_absolute_grid_meter_data(self, cfg, dry_run=False):
 
         now = time.time()
 
@@ -113,8 +111,6 @@ class Network:
 
         new_cosumption = None
         new_production = None
-
-        offset_inverters = []
 
         for node_idx, node in enumerate(self.nodes):
 
@@ -162,57 +158,15 @@ class Network:
             except Exception as e:
                 if not initial_request: self.cfg.log('network: request failed', e)
 
-        if initial_request:
-            self.prev_consumption = {
-                "ts": now,
-                "consumption": new_consumption,
-                "ts_prod": now,
-                "production": new_production,
-                "error_prod": 0
-            }
-            return False
 
-        prev_ts = self.prev_consumption["ts"]
-        if now - prev_ts < 300: prev_ts = now - 300
+        self.prev_consumption = {
+            "ts": now,
+            "consumption": new_consumption,
+            "production": new_production,
+        }
 
-        prev_ts_prod = self.prev_consumption["ts_prod"] if "ts_prod" in self.prev_consumption and self.prev_consumption["ts_prod"] > 0 else prev_ts
-        if now - prev_ts_prod < 300: prev_ts_prod = now - 300
+        return (new_consumption, new_production)
 
-        diff_grid_consumption = max(0, new_consumption - self.prev_consumption["consumption"])
-        diff_grid_production = max(0, new_production - self.prev_consumption["production"])
-
-        plant_production = 0.0
-        if len(offset_inverters) > 0:
-            plant_production = db.get_production_in_range(start=prev_ts_prod-300, end=now-150, inverters=offset_inverters)
-
-        pv_self_consumption = plant_production - diff_grid_production
-        energy_used = diff_grid_consumption + pv_self_consumption + self.prev_consumption["error_prod"]
-
-        if energy_used < 0:
-            self.prev_consumption["error_prod"] = energy_used
-            energy_used = 0
-        else:
-            self.prev_consumption["error_prod"] = 0
-
-        power_used = energy_used / (now - prev_ts) * 3600
-
-        # Reset error if between 1 and 2 AM
-        if datetime.fromtimestamp(now).hour in range(1,2):
-            self.prev_consumption["error_prod"] = 0
-
-        cfg.log("grid consumption: " + str(diff_grid_consumption) + " Wh, grid feed: " + str(diff_grid_production) + " Wh, plant production: " + str(plant_production) + " Wh, total consumption: " + str(energy_used) + " Wh, error: " + str(self.prev_consumption["error_prod"]) + " Wh")
-
-        if not dry_run:
-            db.add_consumption_data_row(now, energy_used, power_used)
-
-        if new_consumption > 0 or new_production > 0:
-            self.prev_consumption["ts"] = now
-            self.prev_consumption["consumption"] = new_consumption
-        if new_production > 0:
-            self.prev_consumption["ts_prod"] = now
-            self.prev_consumption["production"] = new_production
-
-        return True
 
 
     def close(self):

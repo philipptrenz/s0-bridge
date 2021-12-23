@@ -95,10 +95,13 @@ class S0_Bridge:
                     db.add_data(ts_log, new_network_data)
                     self.cfg.log('added pv data from network interfaces')
 
+            grid_in, grid_out = self.ntwrk.get_absolute_grid_meter_data()
             if not dry:
-                added = self.ntwrk.process_consumption(db=db, cfg=self.cfg)
-                if added:
-                    self.cfg.log('added consumption data from network interfaces')
+                self.db.add_grid_meter_data_row(ts_log, grid_in, grid_out)
+                self.cfg.log('added grid meter data from network interfaces')
+            else:
+                self.cfg.log('grid meter data: grid_in =', grid_in, 'Wh, grid_out =', grid_out, 'Wh')
+
 
         # print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
 
