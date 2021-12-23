@@ -96,7 +96,7 @@ class S0_Bridge:
                 self.db.add_grid_meter_data_row(ts_log, grid_in, grid_out)
                 self.cfg.log('added grid meter data from network interfaces')
             else:
-                self.cfg.log('grid meter data: grid_in = ' + grid_in + ' Wh, grid_out = ' + grid_out + ' Wh')
+                self.cfg.log('grid meter data: grid_in = ' + str(grid_in) + ' Wh, grid_out = ' + str(grid_out) + ' Wh')
 
 
         # print(ts_log, '\t', 'watts:', new_serial_data[0]['watts'], ', power:', new_serial_data[0]['power'], '\t', datetime.now())
