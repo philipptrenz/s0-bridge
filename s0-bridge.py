@@ -27,8 +27,6 @@ class S0_Bridge:
         self.cfg.log('adding inverters')
         self.db.add_inverters()
 
-        self.ntwrk.process_consumption(db=self.db, cfg=self.cfg)
-
         self.cfg.log('starting timed data collection (every 5 minutes)')
         try:
             while True:
@@ -55,8 +53,6 @@ class S0_Bridge:
         # initialize
         self.cfg.log('adding inverters')
         self.db.add_inverters()
-
-        self.ntwrk.process_consumption(db=self.db, cfg=self.cfg)
 
         self.cfg.log('doing ' + str(cycles) + ' dry runs:')
         try:
