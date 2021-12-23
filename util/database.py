@@ -15,7 +15,7 @@ class Database():
         self.create_additional_tables()
 
 
-    def create_additional_tables():
+    def create_additional_tables(self):
         query = '''
             CREATE TABLE IF NOT EXISTS GridMeter (
                 TimeStamp datetime NOT NULL,
