@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import time as t, math, sys
 from datetime import datetime
+import traceback
 
 from util.config import Config
 from util.database import Database
@@ -40,6 +41,7 @@ class S0_Bridge:
             print('Shutting down')
         except Exception as e:
             print('Error occured', e)
+            print(traceback.format_exc())
         finally:
             self.db.close()
             self.ser.close()
