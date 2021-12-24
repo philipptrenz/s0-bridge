@@ -114,8 +114,8 @@ class Network:
 
         initial_request = self.prev_consumption["ts"] <= 0
 
-        new_cosumption = None
-        new_production = None
+        new_consumption = 0
+        new_production = 0
 
         for node_idx, node in enumerate(self.nodes):
 
