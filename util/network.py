@@ -65,6 +65,7 @@ class Network:
             except Exception as e:
                 if not initial_request: self.cfg.log('network: request failed', e)
                 new_values = [0] * len( interfaces )
+                continue
 
 
 
